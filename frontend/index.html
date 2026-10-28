@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriSmart 🌱 — Integrated Smart Agriculture Portal</title>
+    <meta name="description" content="AgriSmart — Agriculture tools with weather, crop references, and sample storage and transport directories.">
+    <meta name="theme-color" content="#075c35">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f8f4;
+            color: #173b25;
+        }
+
+        /* Top Sticky Navbar */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #075c35;
+            color: white;
+            padding: 14px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logo span {
+            color: #6ee79a;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 7px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .lang-picker {
+            display: inline-flex;
+            align-items: center;
+            background: #054728;
+            border: 1px solid #2d8256;
+            border-radius: 8px;
+            padding: 4px 10px;
+        }
+
+        .lang-picker select {
+            background: transparent;
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .lang-picker select option {
+            background: #075c35;
+            color: white;
+        }
+
+        nav button,
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 9px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            background: white;
+            color: #075c35;
+            transition: opacity 0.2s;
+        }
+
+        nav button:hover, .btn:hover {
+            opacity: 0.92;
+        }
+
+        .btn-primary {
+            background: #08743f;
+            color: white;
+        }
+
+        .btn-link {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(120deg, #075c35, #15965a);
+            color: white;
+            padding: 50px 6%;
+        }
+
+        .hero h1 {
+            font-size: 38px;
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .hero p {
+            max-width: 720px;
+            line-height: 1.6;
+            font-size: 17px;
+            opacity: 0.95;
+        }
+
+        .hero .hero-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Container & Cards */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        .section-header {
+            margin-bottom: 18px;
+        }
+
+        .section-header h2 {
+            font-size: 23px;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: #4b6655;
+            font-size: 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.06);
+            border: 1px solid #dce8e0;
+        }
+
+        .weather-card {
+            background: #e9f7fc;
+            border-color: #c9eaf5;
+        }
+
+        .icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #08743f;
+            margin: 6px 0;
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #3f5d4a;
+        }
+
+        /* Tables */
+        .table-scroll { overflow-x: auto; }
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,.05);
+            border: 1px solid #dce8e0;
+        }
+
+        th, td {
+            padding: 13px 16px;
+            border-bottom: 1px solid #e7efe9;
+            text-align: left;
+        }
+
+        th {
+            background: #08743f;
+            color: white;
+            font-size: 15px;
+        }
+
+        /* Tool Specific Form & Inputs */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #214d33;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .form-group-wide { grid-column: 1 / -1; }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c2d8cb;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #fdfdfd;
+            color: #14312b;
+            outline: none;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #08743f;
+            box-shadow: 0 0 0 3px rgba(8,116,63,0.15);
+        }
+
+        /* Badges & Directory Cards */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 16px;
+        }
+
+        .directory-card {
+            background: white;
+            border: 1px solid #dce8e0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .directory-card h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+            color: #075c35;
+        }
+
+        .directory-card p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #4b6655;
+        }
+
+        .directory-card .badge {
+            display: inline-block;
+            align-self: flex-start;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #e1f0e7;
+            color: #08743f;
+            margin-bottom: 10px;
+        }
+
+        .directory-card .action-btn {
+            margin-top: 14px;
+            text-align: center;
+            background: #08743f;
+            color: white;
+            text-decoration: none;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        /* Results Box */
+        .result-box {
+            background: #f0f8f3;
+            border-left: 5px solid #08743f;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+/* Assistant Box */
+        .assistant-box {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            border: 1px solid #dce8e0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .assistant-chat {
+            background: #f4f8f4;
+            border-radius: 10px;
+            padding: 16px;
+            min-height: 100px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .assistant-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .assistant-input-row input {
+            flex: 1;
+            min-width: 0;
+            padding: 11px 14px;
+            border: 1px solid #c2d8cb;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            background: #063d24;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        @media(max-width:768px) {
+            .hero h1 { font-size: 29px; }
+            nav { padding: 12px 4%; }
+            .container { width: 94%; }
+.marketplace-cards { grid-template-columns: 1fr !important; }
+            .assistant-input-row { flex-wrap: wrap; }
+            .assistant-input-row input { flex-basis: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION BAR -->
+<nav>
+    <div class="logo" data-i18n="brand">
+        Agri<span>Smart</span> 🌱
+    </div>
+
+    <div class="nav-links">
+        <a href="#hub" class="active" data-i18n="tabHub">🌱 Advisory & Smart Tools</a>
+        <a href="farmer.html" data-i18n="tabFarmer">👨‍🌾 Farmer Dashboard</a>
+        <a href="buyer.html" data-i18n="tabBuyer">🏢 Buyer Dashboard</a>
+        <div id="navAuthBadge" style="display:inline-flex;align-items:center;gap:6px;">
+            <a href="auth.html" id="navAuthLink" class="btn" style="background:#ffffff;color:#075c35;text-decoration:none;padding:7px 12px;border-radius:6px;font-size:13px;font-weight:bold;" data-i18n="tabAuth">🔐 Login / Register</a>
+        </div>
+        
+        <!-- Language Switcher Dropdown -->
+        <div class="lang-picker">
+            <span style="font-size:15px;margin-right:5px;">🌐</span>
+            <select id="langSelect" class="lang-select" aria-label="Language / भाषा" onchange="setLanguage(this.value)">
+                <option value="hi">हिंदी (HI)</option>
+                <option value="en">English (EN)</option>
+            </select>
+        </div>
+
+        <button onclick="detectGPSLocation()" data-i18n="detectLoc">📍 Detect Location</button>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero" id="hub">
+    <h1 data-i18n="heroTitle">Farm decisions made simple.</h1>
+    <p data-i18n="heroDesc">
+        Get location-based weather information, agricultural market prices, and smart farming insights in one place.
+    </p>
+    <div class="hero-actions">
+        <a class="btn btn-link" href="farmer.html" data-i18n="startFarming" style="background:#6ee79a;color:#075c35">Start Farming →</a>
+        <a class="btn btn-link" href="#toolsSection" style="background:rgba(255,255,255,0.2);color:white">Explore Smart Tools ↓</a>
+    </div>
+</section>
+
+<!-- LOCATION STATUS & DISTRICT SELECTOR -->
+<section class="container" id="locationSection">
+    <div class="section-header">
+        <h2 data-i18n="farmLoc">📍 Farm Location & Weather Station</h2>
+        <p data-i18n="locationDesc">Localized weather forecasts and farming tools for your selected district.</p>
+    </div>
+    <div class="card" style="padding:22px;background:white;border-radius:12px;border:1px solid #dce8e0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+            <div style="flex:1;min-width:240px;">
+                <label for="districtSelect" style="display:block;font-weight:bold;margin-bottom:6px;color:#075c35;">
+                    📍 Select Farming District (जिला चुनें):
+                </label>
+                <select id="districtSelect" style="width:100%;max-width:340px;padding:9px 12px;border:1px solid #2d8256;border-radius:8px;font-size:15px;font-weight:600;color:#075c35;background:#f6fbf8;">
+                    <option value="Sehore">Sehore (सीहोर) — Mandi Hub</option>
+                    <option value="Bhopal">Bhopal (भोपाल)</option>
+                    <option value="Ashta">Ashta (आष्टा)</option>
+                    <option value="Ichhawar">Ichhawar (इछावर)</option>
+                    <option value="Budhni">Budhni (बुधनी)</option>
+                    <option value="Indore">Indore (इंदौर)</option>
+                    <option value="Dewas">Dewas (देवास)</option>
+                    <option value="Ujjain">Ujjain (उज्जैन)</option>
+                    <option value="Hoshangabad">Hoshangabad / Narmadapuram (होशंगाबाद)</option>
+                    <option value="Vidisha">Vidisha (विदिशा)</option>
+                    <option value="Raisen">Raisen (रायसेन)</option>
+                    <option value="Rajgarh">Rajgarh (राजगढ़)</option>
+                    <option value="Harda">Harda (हरदा)</option>
+                    <option value="Jabalpur">Jabalpur (जबलपुर)</option>
+                    <option value="Gwalior">Gwalior (ग्वालियर)</option>
+                </select>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" onclick="detectGPSLocation()" style="padding:10px 18px;display:inline-flex;align-items:center;gap:6px;">
+                    <span>🎯</span> <span data-i18n="detectLoc">Detect GPS Location</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Current Active Location Display Badge -->
+        <div style="background:#eef6f1;border:1px solid #c8e4d2;border-radius:8px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+                    <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:#075c35;font-weight:bold;" data-i18n="activeLocationLabel">Active weather location</span>
+                <div style="font-size:18px;font-weight:bold;color:#14312b;margin-top:2px;">
+                    📍 <span id="currentLocationName">Sehore, Madhya Pradesh</span>
+                </div>
+                <div id="currentLocationCoords" style="font-size:13px;color:#5b6e68;margin-top:2px;">
+                    Coordinates: 23.2032° N, 77.0844° E
+                </div>
+            </div>
+            <span id="locationSourceBadge" style="background:#08743f;color:white;font-size:12px;padding:5px 12px;border-radius:99px;font-weight:600;">District Synced</span>
+        </div>
+        <p class="status" id="locationStatus" style="margin-top:10px;font-size:13px;color:#5b6e68;">
+            Weather loads for the selected district. Mandi values are demo estimates.
+        </p>
+        <small data-i18n="locationPrivacyNotice">If you use GPS, coordinates are sent to the weather backend and a reverse-geocoding provider to retrieve weather and a place name.</small>
+    </div>
+</section>
+
+<!-- LIVE WEATHER HUD -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="liveWeather">🌦️ Live Weather</h2>
+    </div>
+    <div class="cards">
+        <div class="card weather-card">
+            <div class="icon">🌡️</div>
+            <h3 data-i18n="temperature">Temperature</h3>
+            <div class="value" id="temperature">--</div>
+            <p>°C</p>
+        </div>
+
+        <div class="card weather-card">
+            <div class="icon">💧</div>
+            <h3 data-i18n="humidity">Humidity</h3>
+            <div class="value" id="humidity">--</div>
+            <p>%</p>
+        </div>
+
+        <div class="card weather-card">
+            <div class="icon">🌧️</div>
+            <h3 data-i18n="rain">Rain</h3>
+            <div class="value" id="rain">--</div>
+            <p>mm</p>
+        </div>
+
+        <div class="card weather-card">
+            <div class="icon">💨</div>
+            <h3 data-i18n="wind">Wind</h3>
+            <div class="value" id="wind">--</div>
+            <p>km/h</p>
+        </div>
+    </div>
+    <p class="status" id="weatherStatus" data-i18n="weatherStatusDefault">
+        Weather for your selected district loads automatically.
+    </p>
+</section>
+
+<!-- 7-DAY FORECAST -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="forecast7Day">📅 7-Day Weather Forecast</h2>
+    </div>
+    <div id="forecast" class="cards" aria-live="polite">
+        <div class="card"><p data-i18n="detectToForecast">Detect your location to load the forecast.</p></div>
+    </div>
+</section>
+
+<!-- SOIL HEALTH & FERTILIZER (N-P-K) CALCULATOR -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="soilTitle">🧪 Soil Health & Fertilizer Calculator (N-P-K)</h2>
+        <p data-i18n="soilDesc">Calculate balanced Urea, DAP, and Potash (MOP) bag requirements based on soil test ratings.</p>
+        <p data-i18n="fertilizerDisclaimer">Illustrative estimate using preset demo values, not a soil-lab recommendation. Confirm fertilizer rates with a local agricultural expert.</p>
+    </div>
+    <div class="card">
+        <form id="fertilizerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fertCrop" data-i18n="cropLabel">Target Crop</label>
+                    <select id="fertCrop">
+                        <option value="wheat">Wheat (गेहूं)</option>
+                        <option value="soybean">Soybean (सोयाबीन)</option>
+                        <option value="maize">Maize (मक्का)</option>
+                        <option value="chana">Chickpea (चना)</option>
+                        <option value="mustard">Mustard (सरसों)</option>
+                        <option value="lentil">Lentil (मसूर)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fertAcres" data-i18n="fertPlotArea">Plot Area (Acres)</label>
+                    <input type="number" id="fertAcres" min="0.1" max="100" step="0.1" value="2" required>
+                </div>
+                <div class="form-group">
+                    <label for="fertSoilN" data-i18n="fertSoilN">Soil Nitrogen (N)</label>
+                    <select id="fertSoilN">
+                        <option value="low">Low (कम)</option>
+                        <option value="medium" selected>Medium (मध्यम)</option>
+                        <option value="high">High (अधिक)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fertSoilP" data-i18n="fertSoilP">Soil Phosphorus (P)</label>
+                    <select id="fertSoilP">
+                        <option value="low">Low (कम)</option>
+                        <option value="medium" selected>Medium (मध्यम)</option>
+                        <option value="high">High (अधिक)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fertSoilK" data-i18n="fertSoilK">Soil Potassium (K)</label>
+                    <select id="fertSoilK">
+                        <option value="low">Low (कम)</option>
+                        <option value="medium" selected>Medium (मध्यम)</option>
+                        <option value="high">High (अधिक)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" data-i18n="calculateBags">Calculate Fertilizer Dose</button>
+        </form>
+
+        <div id="fertResult" class="result-box" style="display:none;"></div>
+    </div>
+</section>
+
+<!-- CROP DISEASE & PEST REFERENCE -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="diseaseTitle">🌿 Crop Disease & Pest Reference</h2>
+        <p data-i18n="diseaseDesc">Compare entered symptoms with a small demo reference. This is not an AI diagnosis or a substitute for expert advice.</p>
+    </div>
+    <div class="card">
+        <form id="diseaseForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="diseaseCrop" data-i18n="diseaseCropLabel">Crop Under Inspection</label>
+                    <select id="diseaseCrop">
+                        <option value="wheat">Wheat (गेहूं)</option>
+                        <option value="soybean">Soybean (सोयाबीन)</option>
+                        <option value="maize">Maize (मक्का)</option>
+                        <option value="chana">Chickpea (चना)</option>
+                        <option value="mustard">Mustard (सरसों)</option>
+                    </select>
+                </div>
+                <div class="form-group form-group-wide">
+                    <label for="diseaseSymptoms" data-i18n="diseaseSympLabel">Visible Leaf / Plant Symptoms</label>
+            <input type="text" id="diseaseSymptoms" maxlength="300" placeholder="e.g., yellow stripes on leaves, powdery yellow spores, wilting..." data-i18n-placeholder="diseaseSympPlaceholder" required>
+                </div>
+            </div>
+            <div style="margin-bottom:14px;background:#f6faf7;border:1px dashed #08743f;border-radius:8px;padding:12px;">
+                <label for="diseasePhoto" style="font-weight:bold;color:#08743f;display:block;margin-bottom:6px;">📷 Photo preview (not analyzed):</label>
+                <input type="file" id="diseasePhoto" accept="image/*" capture="environment" aria-describedby="photoHelp" style="background:#fff;padding:6px;border:1px solid #c2dbcd;border-radius:6px;width:100%;box-sizing:border-box;">
+                <small id="photoHelp" data-i18n="photoPreviewHelp">The photo stays in this browser and is not sent for diagnosis. Enter symptoms below.</small>
+                <div id="diseasePhotoPreview" style="margin-top:10px;display:none;align-items:center;gap:12px;background:#fff;padding:8px 12px;border-radius:6px;border:1px solid #dce8e0;">
+                    <img id="diseasePhotoImg" src="" alt="Crop Leaf Preview" style="width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid #ccc;">
+                    <div style="flex:1;">
+                        <strong id="diseasePhotoName" style="font-size:13px;color:#14312b;display:block;"></strong>
+                        <small style="color:#5b6e68;" data-i18n="photoPreviewOnly">Photo selected for local preview only</small>
+                    </div>
+                    <button type="button" class="btn" style="padding:4px 10px;font-size:12px;background:#ffebee;color:#c62828;" onclick="clearDiseasePhoto()">✕ Remove</button>
+                </div>
+            </div>
+            <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn" style="background:#eef6f0;font-size:12px;" onclick="$('diseaseSymptoms').value='yellow stripes on leaves, yellow powder'">+ Yellow Stripes (पीली धारियां)</button>
+                <button type="button" class="btn" style="background:#eef6f0;font-size:12px;" onclick="$('diseaseCrop').value='maize'; $('diseaseSymptoms').value='shot holes in leaves, caterpillar in maize whorl'">+ Holes & Caterpillar (इल्ली/सुंडी)</button>
+                <button type="button" class="btn" style="background:#eef6f0;font-size:12px;" onclick="$('diseaseCrop').value='soybean'; $('diseaseSymptoms').value='mosaic yellow green, whitefly'">+ Yellow Mosaic (पीला मोज़ेक)</button>
+                <button type="button" class="btn" style="background:#eef6f0;font-size:12px;" onclick="$('diseaseCrop').value='chana'; $('diseaseSymptoms').value='sudden drying of plant, black ring in vascular roots'">+ Sudden Drying (उकठा रोग)</button>
+            </div>
+            <button type="submit" class="btn btn-primary" data-i18n="diagnoseBtn">Diagnose Disease</button>
+        </form>
+
+        <div id="diseaseResult" class="result-box" style="display:none;"></div>
+    </div>
+</section>
+
+<!-- KISAN SAHAYAK AI VOICE ASSISTANT -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="assistantTitle">🎙️ Kisan Sahayak — AI Voice & Agricultural Assistant</h2>
+        <p data-i18n="assistantDesc">Ask any farming query in Hindi or English (Voice & Text supported).</p>
+    </div>
+    <div class="assistant-box">
+        <div id="assistantChat" class="assistant-chat">
+            <strong>Kisan Sahayak:</strong> <span id="assistantMsg">नमस्ते किसान साथी! आप मुझसे आज का मंडी भाव, खाद की खुराक, मौसम या फसल रोग के बारे में पूछ सकते हैं।</span>
+        </div>
+        <p id="assistantMode" class="status" aria-live="polite" data-i18n="assistantDemoMode">Answers may use the local demo rules.</p>
+        <form id="assistantForm">
+            <div class="assistant-input-row">
+                <label class="sr-only" for="assistantInput" data-i18n="assistantInputLabel">Ask a farming question</label>
+                <input type="text" id="assistantInput" maxlength="300" placeholder="e.g., What is wheat mandi price today? How much urea for 2 acres?" data-i18n-placeholder="assistantPlaceholder" required>
+                <button type="button" id="voiceBtn" class="btn" aria-label="Speak your question" data-i18n-aria-label="voiceButtonLabel" style="background:#e1f0e7;color:#08743f;font-size:18px;" title="Speak in Hindi/English" data-i18n-title="voiceButtonTitle">🎤</button>
+                <button type="submit" class="btn btn-primary" data-i18n="askSubmit">Ask Sahayak</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- COLD STORAGE DIRECTORY -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="coldStorageTitle">❄️ Sample Storage Directory</h2>
+        <p data-i18n="directoryDemoNotice">Sample entries only; provider details and certifications have not been independently verified.</p>
+    </div>
+    <div id="coldStorageList" class="grid-cards">
+        <p class="status" data-i18n="loading">Loading facilities…</p>
+    </div>
+</section>
+
+<!-- LOGISTICS & TRANSPORT UNION DIRECTORY -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="logisticsTitle">🚛 Sample Transport Directory</h2>
+        <p data-i18n="directoryDemoNotice">Sample entries only; provider details and certifications have not been independently verified.</p>
+    </div>
+    <div id="transportersList" class="grid-cards">
+        <p class="status" data-i18n="loading">Loading transport operators…</p>
+    </div>
+</section>
+
+<!-- CROP RECOMMENDATIONS -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="cropReco">🌱 Crop Recommendations</h2>
+        <p data-i18n="cropEstimateNotice">These are illustrative demo estimates; confirm decisions with local agricultural experts.</p>
+    </div>
+    <div class="cards">
+        <div class="card crop-reco" data-crop="wheat">
+            <div class="icon">🌾</div>
+            <h3 data-i18n="wheat">Wheat</h3>
+            <p class="crop-desc" data-i18n="loading">Loading recommendation details…</p>
+            <button class="btn" type="button" data-i18n="viewDetails">View Details</button>
+        </div>
+
+        <div class="card crop-reco" data-crop="maize">
+            <div class="icon">🌽</div>
+            <h3 data-i18n="maize">Maize</h3>
+            <p class="crop-desc" data-i18n="loading">Loading recommendation details…</p>
+            <button class="btn" type="button" data-i18n="viewDetails">View Details</button>
+        </div>
+
+        <div class="card crop-reco" data-crop="soybean">
+            <div class="icon">🌱</div>
+            <h3 data-i18n="soybean">Soybean</h3>
+            <p class="crop-desc" data-i18n="loading">Loading recommendation details…</p>
+            <button class="btn" type="button" data-i18n="viewDetails">View Details</button>
+        </div>
+    </div>
+</section>
+
+<!-- MARKETPLACE PORTAL CARDS -->
+<section class="container">
+    <div class="section-header">
+        <h2 data-i18n="buyerMarketTitle">🛒 Farmer Marketplace</h2>
+    </div>
+    <div class="cards marketplace-cards" style="grid-template-columns: 1fr 1fr;">
+        <div class="card">
+            <h3 data-i18n="buyingCropsTitle">Buying crops?</h3>
+            <p data-i18n="buyingCropsDesc" style="margin:8px 0 16px;">Browse the sample mandi catalog and send an offer to a registered farmer.</p>
+            <a class="btn btn-primary btn-link" href="buyer.html" data-i18n="openBuyerDash">Open Buyer Dashboard</a>
+        </div>
+        <div class="card">
+            <h3 data-i18n="sellingCropsTitle">Selling crops?</h3>
+            <p data-i18n="sellingCropsDesc" style="margin:8px 0 16px;">Create a farmer profile to receive buyer offers through Agrismart.</p>
+            <a class="btn btn-primary btn-link" href="farmer.html" data-i18n="openFarmerDash">Open Farmer Dashboard</a>
+        </div>
+    </div>
+</section>
+
+<!-- DIALOG MODAL -->
+<dialog id="cropDialog" style="max-width:520px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:22px;background:#fff;color:#14312B;margin:auto;">
+    <h2 id="cropDialogTitle" data-i18n="cropDetails">Crop details</h2>
+    <div id="cropDialogBody" style="margin:16px 0;line-height:1.7;"></div>
+    <button id="closeCropDialog" class="btn btn-primary" type="button" data-i18n="close">Close</button>
+</dialog>
+
+<!-- GOVERNMENT SCHEMES & SUBSIDIES -->
+<section class="container" id="govSchemesSection">
+    <div class="section-header">
+        <h2 data-i18n="govSchemes">🏛️ Government Schemes & Subsidies</h2>
+        <p data-i18n="govSchemesSub">Central & State Government assistance programs for farmers.</p>
+    </div>
+    <div class="grid-cards">
+        <div class="directory-card">
+            <div>
+                <span class="badge" data-i18n="schemeIncomeBadge">Direct Income Support</span>
+                <h3 data-i18n="schemePmKisan">PM-Kisan Samman Nidhi</h3>
+                <p data-i18n="schemePmKisanDesc">₹6,000 yearly income support paid in 3 installments of ₹2,000 directly into farmer Aadhaar-linked bank accounts.</p>
+                <p data-i18n="schemeEligibility">Eligibility details may change. Check the official portal.</p>
+            </div>
+            <a href="https://pmkisan.gov.in" target="_blank" rel="noopener" class="btn btn-primary action-btn" data-i18n="checkEligibility">Official Portal →</a>
+        </div>
+        <div class="directory-card">
+            <div>
+                <span class="badge" data-i18n="schemeInsuranceBadge">Crop Insurance</span>
+                <h3 data-i18n="schemePmFby">Pradhan Mantri Fasal Bima Yojana (PMFBY)</h3>
+                <p data-i18n="schemePmFbyDesc">Insurance terms, eligible crops, and premiums vary. Check the official portal for current details.</p>
+                <p data-i18n="schemeEligibility">Eligibility details may change. Check the official portal.</p>
+            </div>
+            <a href="https://pmfby.gov.in" target="_blank" rel="noopener" class="btn btn-primary action-btn" data-i18n="checkEligibility">Official Portal →</a>
+        </div>
+        <div class="directory-card">
+            <div>
+                <span class="badge" data-i18n="schemeMachineryBadge">Farm Machinery Subsidy</span>
+                <h3 data-i18n="schemeMachinery">MP Krishi Yantra Anudan</h3>
+                <p data-i18n="schemeMachineryDesc">Availability, eligible equipment, and subsidy rates can change. Check the official state portal.</p>
+                <p data-i18n="schemeEligibility">Eligibility details may change. Check the official portal.</p>
+            </div>
+            <a href="https://dbt.mpdage.org" target="_blank" rel="noopener" class="btn btn-primary action-btn" data-i18n="checkEligibility">Official Portal →</a>
+        </div>
+        <div class="directory-card">
+            <div>
+                <span class="badge" data-i18n="schemeCreditBadge">Institutional Credit</span>
+                <h3 data-i18n="schemeKcc">Kisan Credit Card (KCC)</h3>
+                <p data-i18n="schemeKccDesc">Credit limits, interest, and eligibility depend on current rules and the lender. Check official details.</p>
+                <p data-i18n="schemeEligibility">Eligibility details may change. Check the official portal.</p>
+            </div>
+            <a href="https://myscheme.gov.in/schemes/kcc" target="_blank" rel="noopener" class="btn btn-primary action-btn" data-i18n="checkEligibility">Official Portal →</a>
+        </div>
+    </div>
+</section>
+
+<!-- KISAN EMERGENCY HELPLINE & ADVISORY -->
+<section class="container" id="kisanHelplineSection">
+    <div class="section-header">
+        <h2 data-i18n="kisanHelplines">☎️ Kisan Helpline & Support Directory</h2>
+        <p data-i18n="kisanHelplinesSub">Direct emergency assistance from agriculture scientists and call centers.</p>
+    </div>
+    <div class="grid-cards">
+        <div class="directory-card">
+            <div>
+                <span class="badge" style="background:#e8f5e9;color:#2e7d32;" data-i18n="kisanCallBadge">Kisan Call Centre</span>
+                <h3 data-i18n="kisanCallTitle">National Kisan Call Centre (KCC)</h3>
+                <p data-i18n="kisanCallDesc">Contact the official helpline for agriculture-related questions. Verify availability before calling.</p>
+                <p style="font-size:18px;font-weight:bold;color:#08743f;margin:8px 0;">📞 1800-180-1551</p>
+                <p><small data-i18n="kisanCallHours">Check the official source for current hours and languages.</small></p>
+            </div>
+            <a href="tel:18001801551" class="btn btn-primary action-btn" data-i18n="callOfficialHelpline">Call official helpline</a>
+        </div>
+        <div class="directory-card">
+            <div>
+                <span class="badge" style="background:#e3f2fd;color:#1565c0;" data-i18n="kvkBadge">Agricultural extension centre</span>
+                <h3 data-i18n="kvkTitle">KVK Sehore (Krishi Vigyan Kendra)</h3>
+                <p data-i18n="kvkDesc">Contact details and services should be confirmed with the institution before visiting.</p>
+                <p style="font-size:16px;font-weight:bold;color:#08743f;margin:8px 0;">📞 07562-226456 / 226457</p>
+                <p><small data-i18n="kvkAddress">KVK Research Farm, Sehore (M.P.)</small></p>
+            </div>
+            <a href="tel:07562226456" class="btn btn-primary action-btn" data-i18n="contactKvk">Contact KVK Sehore</a>
+        </div>
+        <div class="directory-card">
+            <div>
+                <span class="badge" style="background:#f3e5f5;color:#6a1b9a;" data-i18n="icarBadge">ICAR institute</span>
+                <h3 data-i18n="icarTitle">ICAR - CIAE Bhopal</h3>
+                <p data-i18n="icarDesc">Contact details and services should be confirmed with the institution before visiting.</p>
+                <p style="font-size:16px;font-weight:bold;color:#08743f;margin:8px 0;">📞 0755-2521000</p>
+                <p><small data-i18n="icarAddress">Nabi Bagh, Berasia Road, Bhopal (M.P.)</small></p>
+            </div>
+            <a href="tel:07552521000" class="btn btn-primary action-btn" data-i18n="contactIcar">Contact ICAR Bhopal</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#0c2617;color:#c1d8ca;padding:45px 6% 35px;border-top:4px solid #15965a;margin-top:60px;">
+    <div style="max-width:1200px;margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;margin-bottom:30px;">
+        <div>
+            <h3 style="color:white;font-size:22px;margin-bottom:10px;" data-i18n="brand">Agri<span>Smart</span> 🌱</h3>
+            <p style="font-size:14px;line-height:1.6;color:#a4c2b0;" data-i18n="footerSummary">Agriculture tools, sample market estimates, and a farmer-buyer demo marketplace.</p>
+        </div>
+        <div>
+            <h4 style="color:white;font-size:16px;margin-bottom:10px;" data-i18n="quickPortals">Quick Portals</h4>
+            <ul style="list-style:none;padding:0;margin:0;font-size:14px;line-height:2;">
+                <li><a href="farmer.html" style="color:#7ee2a8;text-decoration:none;" data-i18n="footerFarmerLink">👨‍🌾 Farmer Dashboard & Sell Produce</a></li>
+                <li><a href="buyer.html" style="color:#7ee2a8;text-decoration:none;" data-i18n="footerBuyerLink">🏢 Buyer Dashboard & Procurement</a></li>
+                <li><a href="auth.html" style="color:#7ee2a8;text-decoration:none;" data-i18n="footerAuthLink">🔐 Login / Farmer Registration</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 style="color:white;font-size:16px;margin-bottom:10px;" data-i18n="footerLegalTitle">Demo Data Notice</h4>
+            <p style="font-size:12px;line-height:1.6;color:#8ba997;" data-i18n="footerDisclaimer">
+                This demo uses sample prices and estimates, not a live APMC feed. Confirm prices, provider details, eligibility, and terms with official sources before acting.
+            </p>
+        </div>
+    </div>
+    <div style="border-top:1px solid #1a422b;padding-top:20px;text-align:center;font-size:13px;color:#8ba997;">
+        © 2026 AgriSmart. Built for Bharat's Farmers. All Rights Reserved.
+    </div>
+</footer>
+
+<!-- External Libraries -->
+
+<!-- Load Multilingual & Authentication Engines BEFORE page logic -->
+<script src="i18n.js"></script>
+<script src="auth.js"></script>
+
+<script>
+const API_BASE = location.protocol === 'file:' ? 'http://localhost:3000' : '';
+const $ = id => document.getElementById(id);
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const readSetting = (key, fallback) => { try { return localStorage.getItem(key) || fallback; } catch { return fallback; } };
+const writeSetting = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+async function requestJson(url, options = {}) {
+    const response = await fetch(url, options);
+    let data = {};
+    try { data = await response.json(); } catch {}
+    if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
+    return data;
+}
+
+let lastForecastData = null;
+let lastCropsData = null;
+
+// Predefined District Coordinates & Meta
+const DISTRICT_COORDS = {
+    Sehore: { lat: 23.2032, lon: 77.0844, nameHi: 'सीहोर' },
+    Bhopal: { lat: 23.2599, lon: 77.4126, nameHi: 'भोपाल' },
+    Ashta: { lat: 23.0181, lon: 76.7197, nameHi: 'आष्टा' },
+    Ichhawar: { lat: 23.0232, lon: 77.0167, nameHi: 'इछावर' },
+    Budhni: { lat: 22.7758, lon: 77.6833, nameHi: 'बुधनी' },
+    Indore: { lat: 22.7196, lon: 75.8577, nameHi: 'इंदौर' },
+    Dewas: { lat: 22.9676, lon: 76.0534, nameHi: 'देवास' },
+    Ujjain: { lat: 23.1765, lon: 75.7885, nameHi: 'उज्जैन' },
+    Hoshangabad: { lat: 22.7519, lon: 77.7289, nameHi: 'होशंगाबाद' },
+    Vidisha: { lat: 23.5251, lon: 77.8081, nameHi: 'विदिशा' },
+    Raisen: { lat: 23.3303, lon: 77.7816, nameHi: 'रायसेन' },
+    Rajgarh: { lat: 24.0064, lon: 76.7262, nameHi: 'राजगढ़' },
+    Harda: { lat: 22.3444, lon: 77.0934, nameHi: 'हरदा' },
+    Jabalpur: { lat: 23.1815, lon: 79.9864, nameHi: 'जबलपुर' },
+    Gwalior: { lat: 26.2183, lon: 78.1828, nameHi: 'ग्वालियर' }
+};
+
+let currentSelectedDistrict = readSetting('agrismart-district', 'Sehore');
+if (!Object.prototype.hasOwnProperty.call(DISTRICT_COORDS, currentSelectedDistrict)) currentSelectedDistrict = 'Sehore';
+let activeFarmCoords = { lat: 23.2032, lon: 77.0844 };
+let gpsLocationActive = false;
+
+function updateLocationDisplay(name, lat, lon, isGPS = false) {
+    activeFarmCoords = { lat, lon };
+    gpsLocationActive = isGPS;
+    const nameEl = $('currentLocationName');
+    const coordsEl = $('currentLocationCoords');
+    const badgeEl = $('locationSourceBadge');
+
+    if (nameEl) nameEl.textContent = name;
+    if (coordsEl) coordsEl.textContent = `${window.t('coordinatesLabel')}: ${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E`;
+    if (badgeEl) {
+        badgeEl.textContent = isGPS
+            ? window.t('gpsVerified')
+            : window.t('districtSynced');
+        badgeEl.style.background = isGPS ? '#054728' : '#08743f';
+    }
+
+}
+
+async function setDistrict(districtName) {
+    currentSelectedDistrict = districtName;
+    writeSetting('agrismart-district', districtName);
+    if ($('districtSelect') && $('districtSelect').value !== districtName) {
+        $('districtSelect').value = districtName;
+    }
+
+    const info = DISTRICT_COORDS[districtName] || DISTRICT_COORDS.Sehore;
+    const displayName = window.currentLanguage === 'hi'
+        ? `${districtName} (${info.nameHi}), मध्य प्रदेश`
+        : `${districtName}, Madhya Pradesh`;
+
+    updateLocationDisplay(displayName, info.lat, info.lon, false);
+    const status = $('locationStatus');
+    if (status) {
+        status.textContent = window.t('districtLoading').replace('{district}', districtName);
+    }
+    await getWeather(info.lat, info.lon, districtName);
+}
+
+async function applyDetectedCoords(placeName, latitude, longitude, isGPS) {
+    const status = $('locationStatus');
+    // Match closest district from our MP catalog
+    let closestDist = 'Sehore', minD = Infinity;
+    for (const [d, coords] of Object.entries(DISTRICT_COORDS)) {
+        const dist = Math.hypot(coords.lat - latitude, coords.lon - longitude);
+        if (dist < minD) { minD = dist; closestDist = d; }
+    }
+    if ($('districtSelect')) {
+        let optExists = Array.from($('districtSelect').options).some(o => o.value === closestDist);
+        if (optExists) {
+            $('districtSelect').value = closestDist;
+        }
+        currentSelectedDistrict = closestDist;
+        writeSetting('agrismart-district', closestDist);
+    }
+
+    updateLocationDisplay(placeName, latitude, longitude, isGPS);
+    if (status) {
+        status.textContent = window.currentLanguage === 'hi'
+            ? `✅ स्थान मिला (${placeName})। मौसम के लिए इन्हीं निर्देशांकों का उपयोग होगा।`
+            : `✅ Location detected (${placeName}). Local coordinates loaded for live weather.`;
+    }
+    await getWeather(latitude, longitude, null);
+}
+
+async function ipFallbackLocation() {
+    const status = $('locationStatus');
+    if (status) status.textContent = window.currentLanguage === 'hi' ? '📡 IP पते से स्थान का पता लगाया जा रहा है…' : '📡 Detecting location from IP address…';
+    try {
+        const ipRes = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout(4000) })
+            .catch(() => fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) }));
+        if (ipRes && ipRes.ok) {
+            const ip = await ipRes.json();
+            const lat = Number(ip.latitude || ip.lat);
+            const lon = Number(ip.longitude || ip.lon);
+            const city = ip.cityName || ip.city || 'Detected Area';
+            const region = ip.regionName || ip.region || 'Madhya Pradesh';
+            if (Number.isFinite(lat) && Number.isFinite(lon)) {
+                await applyDetectedCoords(`${city}, ${region}`, lat, lon, false);
+                return;
+            }
+        }
+    } catch {}
+    await setDistrict(currentSelectedDistrict);
+    if (status) status.textContent = window.t('locUnavailable');
+}
+
+function detectGPSLocation() {
+    const locSec = $('locationSection');
+    if (locSec) locSec.scrollIntoView({ behavior: 'smooth' });
+    const status = $('locationStatus');
+    if (!navigator.geolocation) {
+        ipFallbackLocation();
+        return;
+    }
+
+    if (status) status.textContent = window.t('acquiringGps');
+
+    navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude, longitude } = pos.coords;
+        let placeName = `${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`;
+
+        // Reverse Geocoding attempt via BigDataCloud
+        try {
+            const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`, { signal: AbortSignal.timeout(4000) });
+            if (geoRes.ok) {
+                const geo = await geoRes.json();
+                const locality = geo.locality || geo.city || geo.principalSubdivision;
+                if (locality) {
+                    placeName = `${locality}, ${geo.principalSubdivision || 'Madhya Pradesh'}`;
+                }
+            }
+        } catch {}
+
+        await applyDetectedCoords(placeName, latitude, longitude, true);
+    }, async () => {
+        await ipFallbackLocation();
+    }, { enableHighAccuracy: false, timeout: 7000, maximumAge: 300000 });
+}
+
+// Backwards compatibility alias
+const getLocation = detectGPSLocation;
+
+async function getWeather(latitude, longitude, district) {
+    const status = $('weatherStatus');
+        if (status) status.textContent = window.t('loadingWeather');
+        ['temperature', 'humidity', 'rain', 'wind'].forEach(id => { $(id).textContent = '--'; });
+    try {
+        const params = new URLSearchParams();
+        if (latitude != null && longitude != null) {
+            params.set('latitude', latitude);
+            params.set('longitude', longitude);
+        } else if (district) {
+            params.set('district', district);
+        } else {
+            params.set('district', currentSelectedDistrict);
+        }
+        const data = await requestJson(`${API_BASE}/api/weather?${params}`);
+        if (data.source === 'unavailable') throw Error(window.t('weatherUnavailable'));
+        const c = data.current || {};
+        $('temperature').textContent = c.temperature_2m ?? '--';
+        $('humidity').textContent = c.relative_humidity_2m ?? '--';
+        $('rain').textContent = c.precipitation ?? '--';
+        $('wind').textContent = c.wind_speed_10m ?? '--';
+        lastForecastData = data.daily;
+        renderForecast(data.daily);
+        if (status) status.textContent = data.source === 'Open-Meteo'
+            ? window.t('weatherLiveLoaded')
+            : window.t('weatherDemoLoaded');
+    } catch(e) {
+        if (status) status.textContent = window.t('weatherUnavailable');
+        $('forecast').innerHTML = `<div class="card"><p>${window.t('forecastUnavailable')}</p></div>`;
+    }
+}
+
+function renderForecast(d) {
+    const wrap = $('forecast');
+    wrap.replaceChildren();
+    if (!d?.time?.length) {
+        wrap.innerHTML = `<div class="card"><p>${window.t('forecastUnavailable')}</p></div>`;
+        return;
+    }
+    const daysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const daysHi = ['रवि', 'सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि'];
+    for (let i = 0; i < Math.min(7, d.time.length); i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const date = new Date(d.time[i] + 'T12:00:00');
+        const dayIdx = date.getDay();
+        const dayName = window.currentLanguage === 'hi' ? daysHi[dayIdx] : daysEn[dayIdx];
+        const h = document.createElement('h3');
+        h.textContent = i === 0 ? window.t('today') : dayName;
+        const p = document.createElement('p');
+        p.style.fontWeight = 'bold';
+        p.style.margin = '6px 0';
+        p.textContent = `${d.temperature_2m_min?.[i] ?? '--'}°C – ${d.temperature_2m_max?.[i] ?? '--'}°C`;
+        const r = document.createElement('small');
+        r.textContent = `${window.t('rainLabel')}: ${d.precipitation_probability_max?.[i] ?? 0}% · ${d.precipitation_sum?.[i] ?? 0} mm`;
+        card.append(h, p, r);
+        wrap.append(card);
+    }
+}
+
+// Soil & Fertilizer Calculator
+$('fertilizerForm').onsubmit = async e => {
+    e.preventDefault();
+    const box = $('fertResult');
+    box.style.display = 'block';
+    box.innerHTML = `<p>${window.t('loading')}</p>`;
+    try {
+        const d = await requestJson(`${API_BASE}/api/advisory/fertilizer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                crop: $('fertCrop').value,
+                acres: Number($('fertAcres').value),
+                soilN: $('fertSoilN').value,
+                soilP: $('fertSoilP').value,
+                soilK: $('fertSoilK').value
+            })
+        });
+        box.innerHTML = `
+            <h4 style="margin-bottom:8px;font-size:16px;">🌱 ${window.t('fertBagsRequired')}</h4>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;">
+                <div style="background:white;padding:10px 14px;border-radius:8px;border:1px solid #dce8e0;">
+                    <b>${window.t('ureaLabel')}:</b> <span style="font-size:18px;color:#08743f;font-weight:bold;">${escapeHtml(d.ureaBags)}</span> ${window.t('bagsUnit')}
+                </div>
+                <div style="background:white;padding:10px 14px;border-radius:8px;border:1px solid #dce8e0;">
+                    <b>${window.t('dapLabel')}:</b> <span style="font-size:18px;color:#08743f;font-weight:bold;">${escapeHtml(d.dapBags)}</span> ${window.t('bagsUnit')}
+                </div>
+                <div style="background:white;padding:10px 14px;border-radius:8px;border:1px solid #dce8e0;">
+                    <b>${window.t('mopLabel')}:</b> <span style="font-size:18px;color:#08743f;font-weight:bold;">${escapeHtml(d.mopBags)}</span> ${window.t('bagsUnit')}
+                </div>
+            </div>
+            <p style="margin-top:8px;"><strong>${window.t('fertEstCost')}</strong> ₹${Number(d.estCostRs).toLocaleString('en-IN')}</p>
+            <div style="margin-top:12px;font-size:14px;line-height:1.6;background:white;padding:10px 14px;border-radius:8px;">
+                <strong>${window.t('fertTiming')}</strong><br>
+                • ${window.t('atSowing')}: ${window.t('dapLabel')} ${escapeHtml(d.schedule.basal.dap)}, ${window.t('mopLabel')} ${escapeHtml(d.schedule.basal.mop)}, ${window.t('ureaLabel')} ${escapeHtml(d.schedule.basal.urea)} ${window.t('bagsUnit')}<br>
+                • ${window.t('firstTopDress')}: ${window.t('ureaLabel')} ${escapeHtml(d.schedule.firstTopDress.urea)} ${window.t('bagsUnit')} (${window.t('firstIrrigation')})<br>
+                • ${window.t('secondTopDress')}: ${window.t('ureaLabel')} ${escapeHtml(d.schedule.secondTopDress.urea)} ${window.t('bagsUnit')} (${window.t('floweringStage')})
+            </div>
+        `;
+    } catch(err) {
+        box.textContent = window.t('fertilizerUnavailable');
+    }
+};
+
+// The selected image is only previewed locally; diagnosis uses symptoms only.
+
+const diseasePhotoInput = $('diseasePhoto');
+if (diseasePhotoInput) {
+    diseasePhotoInput.onchange = e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            window.clearDiseasePhoto();
+            $('diseaseResult').style.display = 'block';
+            $('diseaseResult').textContent = window.t('chooseImageFile');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            window.clearDiseasePhoto();
+            $('diseaseResult').style.display = 'block';
+            $('diseaseResult').textContent = window.t('imageTooLarge');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = ev => {
+            $('diseasePhotoImg').src = ev.target.result;
+            $('diseasePhotoName').textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
+            $('diseasePhotoPreview').style.display = 'flex';
+        };
+        reader.onerror = () => {
+            $('diseaseResult').style.display = 'block';
+            $('diseaseResult').textContent = window.t('imageReadError');
+        };
+        reader.readAsDataURL(file);
+    };
+}
+
+window.clearDiseasePhoto = function() {
+    if ($('diseasePhoto')) $('diseasePhoto').value = '';
+    if ($('diseasePhotoImg')) $('diseasePhotoImg').removeAttribute('src');
+    if ($('diseasePhotoPreview')) $('diseasePhotoPreview').style.display = 'none';
+};
+
+$('diseaseForm').onsubmit = async e => {
+    e.preventDefault();
+    const box = $('diseaseResult');
+    box.style.display = 'block';
+    box.innerHTML = `<p>${window.t('loading')}</p>`;
+    try {
+        const d = await requestJson(`${API_BASE}/api/advisory/disease-scan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                crop: $('diseaseCrop').value,
+                symptoms: $('diseaseSymptoms').value
+            })
+        });
+        if (!d.matched || !d.diagnosis) {
+            box.textContent = window.t('noDiseaseMatch');
+            return;
+        }
+        const diag = d.diagnosis;
+        box.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+                <h4 style="font-size:17px;color:#08743f;">🔎 ${escapeHtml(diag.name)}</h4>
+                <span style="background:#e1f0e7;padding:3px 10px;border-radius:99px;font-weight:bold;font-size:12px;">${window.t('referenceMatch')}</span>
+            </div>
+            <p style="margin:6px 0;"><strong>${window.t('organicRemedyLabel')}</strong> ${escapeHtml(diag.organicRemedy)}</p>
+            <p style="margin:6px 0;"><strong>${window.t('chemicalRemedyLabel')}</strong> ${escapeHtml(diag.chemicalRemedy)}</p>
+            <p><small>${window.t('referenceDisclaimer')}</small></p>
+        `;
+    } catch(err) {
+        box.textContent = window.t('diseaseUnavailable');
+    }
+};
+
+// Kisan Sahayak Voice & Text Assistant
+$('assistantForm').onsubmit = async e => {
+    e.preventDefault();
+    const query = $('assistantInput').value.trim();
+    if (!query) return;
+    $('assistantMsg').textContent = window.t('loading');
+    try {
+        const d = await requestJson(`${API_BASE}/api/advisory/assistant`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, lang: window.currentLanguage })
+        });
+        const answer = d.reply || window.t('assistantUnavailable');
+        $('assistantMsg').textContent = answer;
+        $('assistantMode').textContent = d.aiPowered ? window.t('assistantAiMode') : window.t('assistantDemoMode');
+        // Text-to-speech if available
+        if ('speechSynthesis' in window) {
+            const utter = new SpeechSynthesisUtterance(answer);
+            utter.lang = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+            window.speechSynthesis.speak(utter);
+        }
+    } catch(err) {
+        $('assistantMsg').textContent = window.t('assistantUnavailable');
+        $('assistantMode').textContent = window.t('assistantDemoMode');
+    }
+};
+
+// Voice Input (Speech-To-Text)
+$('voiceBtn').onclick = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        $('assistantMode').textContent = window.t('voiceUnavailable');
+        return;
+    }
+    const rec = new SpeechRecognition();
+    rec.lang = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+    try {
+        rec.start();
+        $('voiceBtn').textContent = '🔴';
+    } catch {
+        $('assistantMode').textContent = window.t('voiceUnavailable');
+        return;
+    }
+    rec.onresult = e => {
+        $('assistantInput').value = e.results[0][0].transcript;
+        $('voiceBtn').textContent = '🎤';
+        $('assistantForm').dispatchEvent(new Event('submit'));
+    };
+    rec.onerror = () => {
+        $('voiceBtn').textContent = '🎤';
+        $('assistantMode').textContent = window.t('voiceUnavailable');
+    };
+    rec.onend = () => { $('voiceBtn').textContent = '🎤'; };
+};
+
+// Cold Storage Directory
+async function loadColdStorage() {
+    try {
+        const data = await requestJson(`${API_BASE}/api/cold-storage`);
+        const wrap = $('coldStorageList');
+        wrap.replaceChildren();
+        if (!(data.items || []).length) {
+            wrap.textContent = window.t('noDirectoryEntries');
+            return;
+        }
+        (data.items || []).forEach(cs => {
+            const c = document.createElement('article');
+            c.className = 'directory-card';
+            c.innerHTML = `
+                <div>
+                    <span class="badge">${escapeHtml(window.t('sampleEntry'))}</span>
+                    <h3>❄️ ${escapeHtml(cs.name)}</h3>
+                    <p>📍 ${escapeHtml(cs.district)} · ${Number(cs.capacityMT).toLocaleString('en-IN')} MT ${window.t('capacityLabel')}</p>
+                    <p>🌡️ ${window.t('temperatureLabel')}: ${escapeHtml(cs.tempRange)}</p>
+                    <p>💰 ${window.t('storageFeeLabel')}: ₹${escapeHtml(cs.feePerQtlMonth)}/${window.t('quintalMonth')}</p>
+                </div>
+                <p><strong>${window.t('sampleContact')}:</strong> ${escapeHtml(cs.contact)}</p>
+            `;
+            wrap.append(c);
+        });
+    } catch(e) { $('coldStorageList').textContent = window.t('directoryUnavailable'); }
+}
+
+// Transporters Union Directory
+async function loadTransporters() {
+    try {
+        const data = await requestJson(`${API_BASE}/api/transporters`);
+        const wrap = $('transportersList');
+        wrap.replaceChildren();
+        if (!(data.items || []).length) {
+            wrap.textContent = window.t('noDirectoryEntries');
+            return;
+        }
+        (data.items || []).forEach(tr => {
+            const c = document.createElement('article');
+            c.className = 'directory-card';
+            c.innerHTML = `
+                <div>
+                    <span class="badge">${escapeHtml(window.t('sampleEntry'))}</span>
+                    <h3>🚛 ${escapeHtml(tr.name)}</h3>
+                    <p>🚜 ${escapeHtml(tr.vehicle)} (${escapeHtml(tr.capacityQtl)} ${window.t('quintalCapacity')})</p>
+                    <p>📍 ${escapeHtml(tr.district)}</p>
+                    <p>💰 ${window.t('baseRateLabel')} ₹${escapeHtml(tr.baseRate)} + ₹${escapeHtml(tr.perKmRate)}/${window.t('kmUnit')}</p>
+                </div>
+                <p><strong>${window.t('sampleContact')}:</strong> ${escapeHtml(tr.phone)}</p>
+            `;
+            wrap.append(c);
+        });
+    } catch(e) { $('transportersList').textContent = window.t('directoryUnavailable'); }
+}
+
+// Crop Recommendations
+async function loadCropRecommendations() {
+    try {
+        if (!lastCropsData) {
+            lastCropsData = await requestJson(`${API_BASE}/api/crops`);
+        }
+        const season = lastCropsData.season;
+        for (const card of document.querySelectorAll('.crop-reco')) {
+            const key = card.dataset.crop;
+            const c = lastCropsData.items?.[key];
+            if (!c) continue;
+            const cropName = window.t(key) || c.n;
+            card.querySelector('h3').textContent = cropName;
+            const p = card.querySelector('p');
+            const recoLabel = c.seasons.includes(season) ? window.t('recommended') : window.t('seasonalOption');
+            p.textContent = `${recoLabel} · ${c.y} ${window.t('qPerAcre')} · ${window.t('waterNeed')} ${c.need} mm · ${window.t('estCost')} ₹${Number(c.cost).toLocaleString('en-IN')}${window.t('perAcre')}`;
+            card.querySelector('button').textContent = window.t('viewDetails');
+            card.querySelector('button').onclick = () => {
+                const dialog = $('cropDialog');
+                $('cropDialogTitle').textContent = cropName;
+                const riskText = c.shr <= 0.6 ? window.t('lowerRisk') : window.t('moderateRisk');
+            $('cropDialogBody').innerHTML = `
+                    <p><strong>${window.t('seasonLabel')}</strong> ${escapeHtml(c.seasons.join(', '))}</p>
+                    <p><strong>${window.t('yieldLabel')}</strong> ${escapeHtml(c.y)} ${window.t('qPerAcre')}</p>
+                    <p><strong>${window.t('costLabel')}</strong> ₹${Number(c.cost).toLocaleString('en-IN')}${window.t('perAcre')}</p>
+                    <p><strong>${window.t('waterLabel')}</strong> ${escapeHtml(c.need)} mm</p>
+                    <p><strong>${window.t('riskLabel')}</strong> ${riskText}</p>
+                `;
+                dialog.showModal();
+            };
+        }
+    } catch(e) {
+        for (const card of document.querySelectorAll('.crop-reco')) card.querySelector('p').textContent = window.t('cropDataUnavailable');
+    }
+}
+
+$('closeCropDialog').onclick = () => $('cropDialog').close();
+
+// Dynamic Navigation Authorization status
+function showLoginLink(badge) {
+    const link = document.createElement('a');
+    link.href = 'auth.html';
+    link.className = 'btn';
+    link.style.cssText = 'background:#ffffff;color:#075c35;text-decoration:none;padding:7px 12px;border-radius:6px;font-size:13px;font-weight:bold;';
+    link.textContent = window.t('tabAuth');
+    badge.replaceChildren(link);
+}
+
+function checkNavAuth() {
+    const badge = $('navAuthBadge');
+    if (!badge) return;
+    if (typeof getMe === 'function' && typeof authToken === 'function' && authToken()) {
+        getMe().then(data => {
+            if (data?.user) {
+                const u = data.user;
+                const isFarmer = u.role === 'farmer';
+                const roleIcon = isFarmer ? '👨‍🌾' : '🏢';
+                const dashUrl = isFarmer ? 'farmer.html' : 'buyer.html';
+                const roleLabel = isFarmer ? (window.t ? window.t('farmer') : 'Farmer') : (window.t ? window.t('buyer') : 'Buyer');
+                
+                // If farmer has a registered district, sync on initial view
+                if (data.farmer?.district && !sessionStorage.getItem('agrismart-manual-district')) {
+                    if (data.farmer.district !== currentSelectedDistrict && DISTRICT_COORDS[data.farmer.district]) {
+                        setDistrict(data.farmer.district);
+                    }
+                }
+
+                badge.replaceChildren();
+                const profile = document.createElement('a');
+                profile.href = dashUrl;
+                profile.style.cssText = 'text-decoration:none;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.18);padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.3);color:#ffffff;font-size:13px;font-weight:bold;';
+                const icon = document.createElement('span'); icon.textContent = roleIcon;
+                const name = document.createElement('span'); name.textContent = u.name || '';
+                const role = document.createElement('span');
+                role.style.cssText = 'background:#27ae60;font-size:10px;padding:2px 6px;border-radius:10px;text-transform:uppercase;';
+                role.textContent = roleLabel;
+                profile.append(icon, name, role);
+
+                const switchBtn = document.createElement('button');
+                switchBtn.type = 'button';
+                switchBtn.style.cssText = 'background:rgba(255,255,255,0.25);color:#ffffff;border:1px solid rgba(255,255,255,0.4);padding:5px 10px;font-size:12px;font-weight:bold;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
+                switchBtn.textContent = isFarmer ? '🏢 Buyer Mode' : '👨‍🌾 Farmer Mode';
+                switchBtn.title = isFarmer ? 'Switch to Buyer Dashboard' : 'Switch to Farmer Dashboard';
+                switchBtn.addEventListener('click', () => switchRole(isFarmer ? 'buyer' : 'farmer'));
+
+                const signOut = document.createElement('button');
+                signOut.type = 'button'; signOut.textContent = `🚪 ${window.t ? window.t('logout') : 'Logout'}`;
+                signOut.title = window.t ? window.t('logout') : 'Logout';
+                signOut.style.cssText = 'background:#ffebee;color:#c62828;border:none;padding:6px 10px;font-size:12px;font-weight:bold;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;';
+                signOut.addEventListener('click', () => logout());
+                badge.append(profile, switchBtn, signOut);
+            }
+        }).catch(() => showLoginLink(badge));
+    } else {
+        showLoginLink(badge);
+    }
+}
+
+// Reactive language change listener
+document.addEventListener('agrismart-lang-changed', () => {
+    if (lastForecastData) renderForecast(lastForecastData);
+    if (gpsLocationActive) {
+        const name = $('currentLocationName')?.textContent || window.t('yourFarmLocation');
+        updateLocationDisplay(name, activeFarmCoords.lat, activeFarmCoords.lon, true);
+        getWeather(activeFarmCoords.lat, activeFarmCoords.lon, null);
+    } else {
+        setDistrict(currentSelectedDistrict);
+    }
+    loadCropRecommendations();
+    loadColdStorage();
+    loadTransporters();
+    checkNavAuth();
+});
+
+// District selector change listener
+if ($('districtSelect')) {
+    $('districtSelect').value = currentSelectedDistrict;
+    $('districtSelect').addEventListener('change', e => setDistrict(e.target.value));
+}
+
+// Initial boot
+loadCropRecommendations();
+setDistrict(currentSelectedDistrict);
+loadColdStorage();
+loadTransporters();
+checkNavAuth();
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2A7A4B">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root{--bg:#F6F8F5;--card:#fff;--ink:#14312B;--mut:#5B6E68;--line:#D9E2DD;--ac:#2A7A4B;--acs:#E1F0E7;--warn:#FBF1D2;box-sizing:border-box}
+    @media(prefers-color-scheme:dark){:root{--bg:#0E1C19;--card:#162824;--ink:#E6F0EC;--mut:#9DB3AB;--line:#2A403A;--ac:#5CC38A;--acs:#173A2A;--warn:#3A3010}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Mukta,system-ui,sans-serif}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px max(20px,calc((100% - 1040px)/2));background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+    .brand{font-size:24px;font-weight:800;white-space:nowrap;margin:0;}.brand span{color:var(--ac)}
+    nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    nav a{color:var(--mut);text-decoration:none;font-weight:600;padding:7px 12px;border-radius:6px;transition:background 0.2s}
+    nav a:hover,nav a[aria-current=page]{color:var(--ac);background:var(--acs)}
+    .lang-picker{display:inline-flex;align-items:center;background:#054728;border-radius:8px;padding:4px 10px;color:white;}
+    .lang-picker select{background:transparent;color:white;border:none;font-weight:bold;cursor:pointer;outline:none;font-size:14px;padding:0;margin:0;}
+    .lang-picker select option{background:#075c35;color:white;}
+    main{max-width:1040px;margin:auto;padding:30px 20px 50px}
+    .eyebrow{color:var(--ac);font-weight:700;margin:0 0 2px}
+    h1{font-size:clamp(28px,5vw,38px);line-height:1.15;margin:0 0 5px;font-weight:800}
+    .intro{color:var(--mut);margin:0 0 18px}
+    .note{background:var(--warn);border:1px solid #E0A100;border-radius:8px;padding:12px 14px;margin:0 0 18px;font-size:14px;line-height:1.6;}
+    .dashboard-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:24px 0 30px}
+    .card{padding:20px 14px;border-radius:12px;background:#f1f8e9;text-align:center;border:1px solid var(--line);color:#14312B}
+    .card h3{font-size:15px;color:#5B6E68;margin:0 0 6px;font-weight:600}
+    .card p{font-size:26px;font-weight:bold;margin:0}
+    .card small{color:#5B6E68}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:10px}
+    h2{margin:0;font-size:22px}
+    .section-head p{margin:2px 0 0;color:var(--mut)}
+    .search{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:8px 12px;min-width:220px}
+    .crop-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .crop-card{padding:22px 24px;margin-top:4px;border-radius:12px;background:var(--card);box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid var(--line)}
+    .crop-card h3{font-size:20px;margin:0 0 8px}
+    .crop-card p{margin:4px 0;color:var(--mut)}
+    .crop-card .price{font-size:20px;color:var(--ac);font-weight:800}
+    .crop-card button,.offer-dialog button{padding:10px 18px;border:0;border-radius:8px;cursor:pointer;background:var(--ac);color:white;font:600 15px Mukta,system-ui,sans-serif}
+    .crop-card button{margin-top:12px}
+    .crop-card .secondary{background:var(--bg);color:var(--ink);border:1px solid var(--line);margin-left:8px}
+    .crop-card button:hover,.offer-dialog button:hover{filter:brightness(.94)}
+    .offers{margin-top:30px}
+    .offer-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+    .offer-item,.empty{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+    .offer-item p{margin:3px 0;color:var(--mut)}
+    .status{display:inline-block;border-radius:99px;padding:2px 10px;background:var(--warn);font-size:13px;font-weight:700}
+    .button-link{display:inline-block;background:var(--ac);color:#fff;border-radius:8px;padding:9px 16px;text-decoration:none;font-weight:700;margin-top:18px}
+    .button-link:hover{filter:brightness(.94)}
+    .message{margin:12px 0;color:var(--ac);font-weight:700}.error{color:#a52c24}.empty{color:var(--mut)}
+    footer{color:var(--mut);font-size:13px;margin-top:30px;line-height:1.6;}
+    .offer-dialog{width:min(480px,calc(100% - 28px));border:1px solid var(--line);border-radius:12px;padding:22px;background:var(--card);color:var(--ink)}
+    .offer-dialog::backdrop{background:#10251dbb}
+    .offer-dialog h2{margin:0 0 4px}
+    .offer-dialog>p{color:var(--mut);margin:0 0 14px}
+    .offer-dialog label{display:block;font-weight:600;margin:10px 0}
+    .offer-dialog input,.offer-dialog select{display:block;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin-top:3px}
+    .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .offer-dialog button.secondary{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+    @media(max-width:760px){header{align-items:flex-start;flex-direction:column;padding:12px 18px}.dashboard-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.crop-list,.offer-list{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.search{width:100%}}
+    @media print{body *{visibility:hidden}#invoiceDialog,#invoiceDialog *{visibility:visible}#invoiceDialog{position:fixed;left:0;top:0;width:100%;max-width:100%;border:none;box-shadow:none;padding:16px;background:#fff}.no-print{display:none !important}}
+  </style>
+</head>
+<body>
+  <header>
+    <h2 class="brand" data-i18n="brand">🌾 Agri<span>smart</span></h2>
+    <nav aria-label="Main navigation">
+      <a href="index.html" data-i18n="home">Home</a>
+      <a href="farmer.html" data-i18n="farmerDash">Farmer Dashboard</a>
+      <a href="buyer.html" aria-current="page" data-i18n="buyerDash">Buyer Dashboard</a>
+      <div class="lang-picker">
+        <span style="font-size:15px;margin-right:4px;">🌐</span>
+        <select id="langSelect" class="lang-select" onchange="setLanguage(this.value)">
+          <option value="hi">हिंदी (HI)</option>
+          <option value="en">English (EN)</option>
+        </select>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Authorized Account Banner -->
+    <div id="authAccountBanner" style="background:#e8f0fe;border:1px solid #c7d7f7;border-radius:10px;padding:12px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">🛡️</span>
+        <div>
+          <div style="font-weight:bold;color:#1e40af;font-size:15px;">
+            🏢 <span id="authBuyerName">Buyer / Trader Account</span> · <span style="background:#1e40af;color:white;padding:2px 8px;border-radius:99px;font-size:11px;">Verified Role</span>
+          </div>
+          <div id="authBuyerEmail" style="font-size:13px;color:#5b6e68;margin-top:2px;">Authenticated via AgriSmart Secure Cloud</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn" style="background:#2A7A4B;color:white;border:none;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;display:inline-flex;align-items:center;gap:6px;" onclick="switchRole('farmer')">
+          👨‍🌾 <span data-i18n="switchToFarmer">Switch to Farmer Dashboard</span>
+        </button>
+        <button type="button" class="secondary" style="color:#c62828;border-color:#ffcdd2;padding:6px 14px;font-size:13px;" onclick="logout()">
+          🚪 Logout
+        </button>
+      </div>
+    </div>
+
+    <p class="eyebrow" data-i18n="buyerMarketplaceEyebrow">AGRISMART MARKETPLACE</p>
+    <h1 data-i18n="buyerTitle">Buyer Dashboard 🏢</h1>
+    <p class="intro" data-i18n="buyerIntro">Find crops and record an offer for your preferred quantity and price.</p>
+    <p class="note" data-i18n="buyerNote">You are using a secure buyer account. Offers, orders and notifications are stored on the AgriSmart backend. Mandi prices remain clearly labelled as demo data until a live provider is connected.</p>
+
+    <section class="dashboard-cards" aria-label="Buyer summary">
+      <article class="card">
+        <h3 data-i18n="availCrops">🌾 Available Crops</h3>
+        <p id="cropCount">…</p>
+        <small data-i18n="inPriceCatalog">in sample price catalog</small>
+      </article>
+      <article class="card">
+        <h3 data-i18n="myOrders">📦 My Orders</h3>
+        <p id="orderCount">0</p>
+        <small data-i18n="confirmedOrdersSub">confirmed orders</small>
+      </article>
+      <article class="card">
+        <h3 data-i18n="activeOffers">🤝 Active Offers</h3>
+        <p id="offerCount">…</p>
+        <small data-i18n="savedInApp">saved in this app</small>
+      </article>
+      <article class="card">
+        <h3 data-i18n="completedCard">✅ Completed</h3>
+        <p id="completedCount">0</p>
+        <small data-i18n="deliveredOrders">delivered orders</small>
+      </article>
+    </section>
+
+    <!-- Marketplace Harvest Listings -->
+    <section class="offers" aria-labelledby="marketplaceHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="marketplaceHeading" data-i18n="browseMarketplace">🌾 Available Farm Harvests (Marketplace)</h2>
+          <p data-i18n="browseMarketplaceSub">Direct listings from local farmers ready for purchase.</p>
+        </div>
+        <button type="button" id="refreshListings" class="secondary" data-i18n="refreshOffers">Refresh listings</button>
+      </div>
+      <div class="offer-list" id="marketplaceListings" aria-live="polite">
+        <p class="empty" data-i18n="noMarketplaceListings">Loading harvest listings…</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="availableHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="availableHeading" data-i18n="availCropsHeading">Available Crops</h2>
+          <p>Browse crops and send offers. Farmer-listed prices appear in the marketplace listings above.</p>
+        </div>
+        <input class="search" id="search" type="search" placeholder="Search crops…" data-i18n-placeholder="searchCropsPlaceholder" aria-label="Search crops">
+      </div>
+      <div class="crop-list" id="cropList" aria-live="polite">
+        <p class="empty" data-i18n="loadingCrops">Loading crops from the Agrismart backend…</p>
+      </div>
+    </section>
+
+    <section class="offers" aria-labelledby="offersHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="offersHeading" data-i18n="sentOffersHeading">Sent Offers</h2>
+          <p data-i18n="sentOffersSub">Offer status updates when the selected farmer responds.</p>
+        </div>
+        <button type="button" id="refreshOffers" data-i18n="refreshStatus">Refresh status</button>
+      </div>
+      <div class="offer-list" id="offerList" aria-live="polite">
+        <p class="empty" data-i18n="noOffersSent">Loading saved offers…</p>
+      </div>
+      <p id="message" class="message" role="status"></p>
+    </section>
+
+    <section class="offers" aria-labelledby="ordersHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="ordersHeading" data-i18n="ordersTitle">Orders</h2>
+          <p data-i18n="ordersDesc">Accepted offers become confirmed orders automatically.</p>
+        </div>
+        <button type="button" id="refreshOrders" data-i18n="refreshOrders">Refresh orders</button>
+      </div>
+      <div class="offer-list" id="orderList">
+        <p class="empty" data-i18n="loadingOrders">Loading orders…</p>
+      </div>
+    </section>
+
+    <section class="offers" aria-labelledby="notificationsHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="notificationsHeading" data-i18n="notifications">Notifications</h2>
+          <p data-i18n="notificationsSub">Offer and order updates from farmers.</p>
+        </div>
+        <button type="button" id="readNotifications" data-i18n="markAllRead">Mark all read</button>
+      </div>
+      <div class="offer-list" id="notificationList">
+        <p class="empty" data-i18n="noNotifications">Loading notifications…</p>
+      </div>
+    </section>
+
+    <footer data-i18n="buyerDisclaimer">
+      Market prices are demo references. Orders track agreement, payment state and delivery state; connect a payment gateway and logistics provider for real transactions.
+    </footer>
+  </main>
+
+  <dialog class="offer-dialog" id="offerDialog">
+    <form id="offerForm">
+      <h2 data-i18n="makeOfferDialogTitle">Make an Offer</h2>
+      <p data-i18n="makeOfferDialogSub">Send your crop, quantity, price and optional early-sale bonus to a registered farmer.</p>
+      <label><span data-i18n="sendToFarmer">Send to farmer</span><select id="offerFarmer" name="farmerId" required></select></label>
+      <label><span data-i18n="cropLabel">Crop</span><select id="offerCrop" name="crop" required>
+        <option value="wheat">Wheat / गेहूँ</option>
+        <option value="chana">Chickpea (Chana) / चना</option>
+        <option value="mustard">Mustard / सरसों</option>
+        <option value="soybean">Soybean / सोयाबीन</option>
+        <option value="maize">Maize / मक्का</option>
+        <option value="lentil">Lentil (Masoor) / मसूर</option>
+        <option value="paddy">Paddy / Rice / धान</option>
+        <option value="cotton">Cotton / कपास</option>
+        <option value="onion">Onion / प्याज</option>
+        <option value="potato">Potato / आलू</option>
+        <option value="garlic">Garlic / लहसुन</option>
+        <option value="moong">Green Gram (Moong) / मूंग</option>
+        <option value="urad">Black Gram (Urad) / उड़द</option>
+        <option value="groundnut">Groundnut (Peanut) / मूंगफली</option>
+        <option value="turmeric">Turmeric / हल्दी</option>
+      </select></label>
+      <label><span data-i18n="quantityQuintals">Quantity (quintals)</span><input id="offerQuantity" name="quantity" type="number" min="0.1" step="0.1" value="50" required></label>
+      <label><span data-i18n="baseOfferPrice">Your base offer price (₹ per quintal)</span><input id="offerPrice" name="price" type="number" min="1" step="1" required></label>
+      <label><span data-i18n="earlyBonus">Extra early-sale bonus (₹ per quintal)</span><input id="offerBonus" name="earlyBonusPerQuintal" type="number" min="0" step="1" value="0"></label>
+      <label><span data-i18n="deliverByDate">Deliver by date (required when a bonus is offered)</span><input id="offerDate" name="deliveryBy" type="date"></label>
+      <p id="offerEstimate" class="note" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button class="secondary" type="button" id="cancelOffer" data-i18n="cancel">Cancel</button>
+        <button type="submit" data-i18n="saveOffer">Save offer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Escrow Payment Modal -->
+  <dialog id="escrowDialog" style="max-width:440px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:24px;background:#fff;color:#14312B;margin:auto;text-align:center;">
+    <h3 style="margin-bottom:8px;">🔒 AgriSmart Escrow Protection</h3>
+    <p id="escrowSubtitle" style="color:#5B6E68;font-size:14px;margin-bottom:14px;"></p>
+    <div style="background:#f6f8f5;padding:16px;border-radius:12px;margin-bottom:14px;display:inline-block;">
+      <img id="escrowQrImg" src="" alt="UPI QR Code" style="width:170px;height:170px;display:block;margin:auto;border-radius:8px;">
+      <p id="escrowAmountText" style="font-size:17px;font-weight:bold;color:#08743f;margin-top:8px;"></p>
+      <small style="color:#5B6E68;">UPI ID: escrow@agrismart</small>
+    </div>
+    <p style="font-size:13px;color:#5B6E68;margin-bottom:16px;">Funds remain safely held in AgriSmart escrow until the farmer delivers the confirmed harvest.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <button type="button" id="payRazorpayBtn" style="background:#08743f;color:white;width:100%;font-size:15px;padding:10px 16px;border-radius:8px;font-weight:700;">💳 Pay Online (Razorpay / UPI / Cards)</button>
+      <div style="display:flex;gap:10px;width:100%;">
+        <button type="button" class="secondary" style="flex:1;" onclick="$('escrowDialog').close()">Cancel</button>
+        <button type="button" id="confirmEscrowBtn" class="secondary" style="flex:1;font-size:13px;">Simulate UPI Payment ✅</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Negotiation Chat Dialog -->
+  <dialog id="chatDialog" style="max-width:520px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:22px;background:#fff;color:#14312B;margin:auto;">
+    <h3 id="chatTitle" style="margin-bottom:10px;">💬 Negotiation Chat</h3>
+    <div id="chatMessages" style="height:220px;overflow-y:auto;background:#f6f8f5;border-radius:8px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;font-size:14px;"></div>
+    <form id="chatForm" style="display:flex;gap:8px;">
+      <input type="text" id="chatInput" placeholder="Type your message…" required style="flex:1;">
+      <button type="submit">Send</button>
+      <button type="button" class="secondary" onclick="$('chatDialog').close()">Close</button>
+    </form>
+  </dialog>
+
+  <!-- Mandi Trade Invoice Dialog -->
+  <dialog id="invoiceDialog" style="max-width:540px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:24px;background:#fff;color:#14312B;margin:auto;">
+    <div id="invoicePrintArea">
+      <div style="text-align:center;border-bottom:2px dashed #2A7A4B;padding-bottom:12px;margin-bottom:14px;">
+        <h2 style="margin:0;color:#2A7A4B;font-size:20px;">🌾 AGRISMART MANDI TRADE RECEIPT</h2>
+        <p style="margin:4px 0 0;font-size:12px;color:#5B6E68;">National e-Mandi Benchmark Compliance Bill / व्यापार पर्ची</p>
+      </div>
+      <div id="invoiceContent" style="font-size:14px;line-height:1.6;"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;border-top:1px solid #eee;padding-top:12px;" class="no-print">
+      <button type="button" class="secondary" onclick="$('invoiceDialog').close()">Close</button>
+      <button type="button" onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+  </dialog>
+
+  <!-- Load i18n BEFORE auth and page logic -->
+  <script src="i18n.js"></script>
+  <script src="auth.js"></script>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const cropList = $('cropList'), offerList = $('offerList'), search = $('search');
+    const dialog = $('offerDialog'), offerForm = $('offerForm');
+    let crops = {}, cropCards = [], farmers = [];
+    let cachedOffers = [], cachedOrders = [], cachedNotifs = [];
+    let currentChatOfferId = '', activeEscrowOrderId = '';
+
+    const money = v => '₹' + Number(v || 0).toLocaleString('en-IN');
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+    function message(text, error = false) {
+      $('message').textContent = text;
+      $('message').className = error ? 'message error' : 'message';
+    }
+
+    function renderCrops(filter = '') {
+      cropList.replaceChildren();
+      const visible = cropCards.filter(x => (x.name.toLowerCase().includes(filter.trim().toLowerCase()) || (window.t(x.key)||'').toLowerCase().includes(filter.trim().toLowerCase())));
+      if (!visible.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noCropsFound');
+        cropList.append(e);
+        return;
+      }
+      for (const item of visible) {
+        const card = document.createElement('article');
+        card.className = 'crop-card';
+        const cropTitle = window.t(item.key) || item.name;
+        const h = document.createElement('h3');
+        h.textContent = '🌾 ' + cropTitle;
+
+        const cropMeta = crops[item.key] || {};
+        const detail = document.createElement('p');
+        detail.textContent = `${window.t('seasonLabel')} ${(cropMeta.seasons || []).join(', ')} · ${window.t('yieldShort')} ${cropMeta.y || '—'} ${window.t('qPerAcre')} · ${window.t('waterLabel')} ${cropMeta.need || '—'} mm`;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = window.t('makeOffer');
+        btn.onclick = () => openOffer(item.key);
+
+        const details = document.createElement('button');
+        details.type = 'button';
+        details.className = 'secondary';
+        details.textContent = window.t('viewDetails');
+        details.onclick = () => alert(`${cropTitle}\n${window.t('seasonLabel')} ${(cropMeta.seasons || []).join(', ')}\n${window.t('yieldLabel')} ${cropMeta.y} ${window.t('qPerAcre')}\n${window.t('costLabel')} ${money(cropMeta.cost)} ${window.t('perAcre')}\n${window.t('waterLabel')} ${cropMeta.need} mm`);
+
+        card.append(h, detail, btn, details);
+        cropList.append(card);
+      }
+    }
+
+    function renderOffers(items) {
+      cachedOffers = items || [];
+      offerList.replaceChildren();
+      const active = cachedOffers.filter(x => x.status === 'pending');
+      $('offerCount').textContent = active.length;
+
+      if (!cachedOffers.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noOffersSent');
+        offerList.append(e);
+        return;
+      }
+
+      for (const item of [...cachedOffers].reverse()) {
+        const card = document.createElement('article');
+        card.className = 'offer-item';
+        const title = document.createElement('strong');
+        const translatedCrop = window.t(item.crop) || item.cropName || crops[item.crop]?.n || item.crop;
+        title.textContent = '🌾 ' + translatedCrop;
+
+        const st = document.createElement('span');
+        st.className = 'status';
+        st.textContent = window.t('status' + item.status[0].toUpperCase() + item.status.slice(1)) || item.status;
+
+        const line = document.createElement('p');
+        line.textContent = `${item.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'} · ${money(item.totalPricePerQuintal)}/${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintal'}`;
+
+        const recipient = document.createElement('p');
+        recipient.textContent = `${window.t('toFarmer')} ${item.farmerName || 'Unassigned'}`;
+
+        const when = document.createElement('p');
+        const locale = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+        when.textContent = `${window.t('sentLabel')} ${new Date(item.createdAt).toLocaleString(locale)}`;
+
+        card.append(title, document.createTextNode(' '), st, line, recipient, when);
+
+        // Counter-Offer banner if countered
+        if (item.status === 'countered' && item.counterPrice) {
+          const counterBox = document.createElement('div');
+          counterBox.style.cssText = 'background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;';
+          counterBox.innerHTML = `<span><strong>💬 Farmer Countered:</strong> ₹${escapeHtml(item.counterPrice)}/q</span>`;
+          
+          const btnGroup = document.createElement('div');
+          btnGroup.style.cssText = 'display:flex;gap:6px;';
+
+          const accBtn = document.createElement('button');
+          accBtn.type = 'button';
+          accBtn.textContent = window.currentLanguage === 'hi' ? 'स्वीकार करें' : 'Accept Rate';
+          accBtn.style.cssText = 'background:#08743f;color:white;padding:5px 10px;font-size:13px;border-radius:6px;';
+          accBtn.onclick = () => acceptCounter(item.id);
+
+          const rejBtn = document.createElement('button');
+          rejBtn.type = 'button';
+          rejBtn.textContent = window.currentLanguage === 'hi' ? 'अस्वीकार करें' : 'Decline';
+          rejBtn.className = 'secondary';
+          rejBtn.style.cssText = 'background:#f44336;color:white;border:none;padding:5px 10px;font-size:13px;border-radius:6px;';
+          rejBtn.onclick = () => rejectCounter(item.id);
+
+          btnGroup.append(accBtn, rejBtn);
+          counterBox.append(btnGroup);
+          card.append(counterBox);
+        }
+
+        const actDiv = document.createElement('div');
+        actDiv.style.marginTop = '8px';
+        const chatBtn = document.createElement('button');
+        chatBtn.type = 'button';
+        chatBtn.className = 'secondary';
+        chatBtn.textContent = window.t('chatBtn');
+        chatBtn.style.padding = '6px 12px';
+        chatBtn.onclick = () => openChat(item.id, item.farmerName || 'Farmer', item.cropName || item.crop);
+        actDiv.append(chatBtn);
+        card.append(actDiv);
+
+        offerList.append(card);
+      }
+    }
+
+    async function acceptCounter(offerId) {
+      try {
+        await api(`/api/offers/${encodeURIComponent(offerId)}/accept-counter`, { method: 'POST' });
+        message(window.currentLanguage === 'hi' ? 'काउंटर भाव स्वीकार कर लिया गया! ऑर्डर कन्फर्म हो गया।' : 'Counter-offer accepted! Confirmed order created.');
+        await loadData();
+      } catch(err) {
+        message(err.message, true);
+      }
+    }
+
+    async function rejectCounter(offerId) {
+      if (!confirm(window.currentLanguage === 'hi' ? 'क्या आप यह काउंटर भाव अस्वीकार करना चाहते हैं?' : 'Decline this counter-offer?')) return;
+      try {
+        await api(`/api/offers/${encodeURIComponent(offerId)}/reject-counter`, { method: 'POST' });
+        message(window.currentLanguage === 'hi' ? 'काउंटर भाव अस्वीकार कर दिया गया।' : 'Counter-offer declined.');
+        await loadData();
+      } catch(err) {
+        message(err.message, true);
+      }
+    }
+
+    function renderOrders(items) {
+      cachedOrders = items || [];
+      const list = $('orderList');
+      list.replaceChildren();
+      $('orderCount').textContent = cachedOrders.length;
+      $('completedCount').textContent = cachedOrders.filter(x => x.status === 'completed').length;
+
+      if (!cachedOrders.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noOrdersYet');
+        list.append(e);
+        return;
+      }
+
+      for (const o of cachedOrders) {
+        const card = document.createElement('article');
+        card.className = 'offer-item';
+        const h = document.createElement('strong');
+        const translatedCrop = window.t(o.crop) || o.cropName || o.crop;
+        h.textContent = '📦 ' + translatedCrop;
+
+        const p = document.createElement('p');
+        p.textContent = `${o.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'} · ${money(o.totalAmount)} ${window.t('total')}`;
+
+        const payStatusTrans = window.t('status' + o.paymentStatus[0].toUpperCase() + o.paymentStatus.slice(1)) || o.paymentStatus;
+        const delStatusTrans = window.t('status' + (o.deliveryStatus === 'in_transit' ? 'InTransit' : o.deliveryStatus[0].toUpperCase() + o.deliveryStatus.slice(1))) || o.deliveryStatus;
+
+        const status = document.createElement('p');
+        status.textContent = `${window.currentLanguage === 'hi' ? 'ऑर्डर' : 'Order'}: ${o.status} · ${window.t('paymentStatus')} ${payStatusTrans} · ${window.t('deliveryStatus')} ${delStatusTrans}`;
+
+        const pay = document.createElement('select');
+        const payMap = {
+          'pending': `${window.t('paymentStatus')} ${window.t('statusPending')}`,
+          'paid': `${window.t('paymentStatus')} ${window.t('statusPaid')}`,
+          'failed': `${window.t('paymentStatus')} ${window.t('statusFailed')}`
+        };
+        for (const [v, text] of Object.entries(payMap)) {
+          const op = document.createElement('option');
+          op.value = v;
+          op.textContent = text;
+          if (o.paymentStatus === v) op.selected = true;
+          pay.append(op);
+        }
+        pay.onchange = async () => {
+          try {
+            await api('/api/orders/' + encodeURIComponent(o.id), {
+              method: 'PATCH',
+              body: JSON.stringify({ paymentStatus: pay.value })
+            });
+            await loadOrders();
+          } catch (e) {
+            message(e.message, true);
+          }
+        };
+
+        card.append(h, p, status, pay);
+
+        // Escrow Deposit QR button
+        if (o.paymentStatus === 'pending') {
+          const escrowBtn = document.createElement('button');
+          escrowBtn.type = 'button';
+          escrowBtn.textContent = window.t('payEscrow');
+          escrowBtn.style.cssText = 'background:#08743f;color:white;font-size:13px;padding:6px 12px;margin-top:8px;border-radius:6px;display:inline-block;';
+          escrowBtn.onclick = () => openEscrowModal(o);
+          card.append(escrowBtn);
+        }
+
+        const printBtn = document.createElement('button');
+        printBtn.type = 'button';
+        printBtn.className = 'secondary';
+        printBtn.style.cssText = 'font-size:13px;padding:6px 12px;margin-top:8px;margin-left:6px;border-radius:6px;display:inline-block;';
+        printBtn.textContent = '🧾 ' + (window.t('printReceipt') || 'Print Mandi Bill');
+        printBtn.onclick = () => openMandiInvoice(o);
+        card.append(printBtn);
+
+        list.append(card);
+      }
+    }
+
+    function openMandiInvoice(o) {
+      const cropTitle = window.t(o.crop) || o.cropName || o.crop;
+      const invNum = 'AGRI-' + (o.id ? o.id.slice(-6).toUpperCase() : Math.floor(100000 + Math.random()*900000));
+      const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN');
+      const rate = Math.round(Number(o.totalAmount || 0) / (Number(o.quantity) || 1));
+      const cess = Math.round(Number(o.totalAmount || 0) * 0.015);
+      const grandTotal = Number(o.totalAmount || 0) + cess;
+      const payStatus = window.t('status' + o.paymentStatus[0].toUpperCase() + o.paymentStatus.slice(1)) || o.paymentStatus;
+      const delStatus = window.t('status' + (o.deliveryStatus === 'in_transit' ? 'InTransit' : o.deliveryStatus[0].toUpperCase() + o.deliveryStatus.slice(1))) || o.deliveryStatus;
+
+      $('invoiceContent').innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;">
+          <div><strong>Trade Bill No:</strong> ${escapeHtml(invNum)}</div>
+          <div><strong>Date:</strong> ${escapeHtml(dateStr)}</div>
+        </div>
+        <div style="background:#F4F8F4;padding:10px;border-radius:6px;margin-bottom:12px;font-size:13px;">
+          <div><strong>Seller / Farmer:</strong> ${escapeHtml(o.farmerName || 'Registered Farmer')}</div>
+          <div><strong>Buyer / Mandi Trader:</strong> ${escapeHtml(o.buyerName || 'Registered Buyer')}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px;">
+          <thead>
+            <tr style="background:#E8F5E9;text-align:left;">
+              <th style="padding:6px;border:1px solid #ddd;">Crop</th>
+              <th style="padding:6px;border:1px solid #ddd;">Qty (Qtl)</th>
+              <th style="padding:6px;border:1px solid #ddd;">Agreed Rate (₹)</th>
+              <th style="padding:6px;border:1px solid #ddd;text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:6px;border:1px solid #ddd;">${escapeHtml(cropTitle)}</td>
+              <td style="padding:6px;border:1px solid #ddd;">${Number(o.quantity) || 0}</td>
+              <td style="padding:6px;border:1px solid #ddd;">₹${rate.toLocaleString('en-IN')}</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding:6px;border:1px solid #ddd;text-align:right;color:#555;">Mandi Cess / User Fee (1.5%):</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;color:#555;">₹${cess.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr style="font-weight:bold;background:#F1F8E9;">
+              <td colspan="3" style="padding:6px;border:1px solid #ddd;text-align:right;">Total Settlement:</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;color:#2A7A4B;">₹${grandTotal.toLocaleString('en-IN')}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;color:#5B6E68;border-top:1px dashed #D9E2DD;padding-top:8px;">
+          <div><strong>Payment Status:</strong> ${escapeHtml(payStatus)} · <strong>Delivery:</strong> ${escapeHtml(delStatus)}</div>
+          <div style="margin-top:4px;">Direct Mandi e-Trading Settlement guaranteed under AgriSmart Fair Trade Benchmark.</div>
+        </div>
+      `;
+      $('invoiceDialog').showModal();
+    }
+
+    let cachedListings = [];
+
+    function renderMarketplaceListings(items) {
+      cachedListings = items || [];
+      const cont = $('marketplaceListings');
+      cont.replaceChildren();
+
+      if (!cachedListings.length) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = window.t('noMarketplaceListings');
+        cont.append(p);
+        return;
+      }
+
+      for (const item of cachedListings) {
+        const card = document.createElement('article');
+        card.className = 'offer-item';
+        const cropTitle = window.t(item.crop) || item.cropName || item.crop;
+
+        const h = document.createElement('strong');
+        h.textContent = '🌾 ' + cropTitle + (item.variety ? ` (${item.variety})` : '');
+
+        const p1 = document.createElement('p');
+        p1.innerHTML = `<strong>${item.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'}</strong> @ <strong>${money(item.expectedPrice)} / ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'qtl'}</strong>`;
+
+        const p2 = document.createElement('p');
+        p2.style.fontSize = '13px';
+        const fInfo = farmers.find(f => f.id === item.farmerId);
+        const farmerLabel = fInfo ? `${fInfo.name} (${fInfo.district})` : (item.farmerName || 'Local Farmer');
+        p2.textContent = `Seller: ${farmerLabel} · ${item.harvestDate ? 'Ready: ' + item.harvestDate + ' · ' : ''}${item.notes || 'Fresh lot'}`;
+
+        const offerBtn = document.createElement('button');
+        offerBtn.type = 'button';
+        offerBtn.style.cssText = 'background:#2A7A4B;color:white;font-size:13px;padding:6px 14px;margin-top:8px;border-radius:6px;';
+        offerBtn.textContent = '🤝 ' + (window.t('makeOffer') || 'Make Purchase Offer');
+        offerBtn.onclick = () => makeOfferFromListing(item);
+
+        card.append(h, p1, p2, offerBtn);
+        cont.append(card);
+      }
+    }
+
+    function makeOfferFromListing(item) {
+      if (item.farmerId && $('offerFarmer')) {
+        $('offerFarmer').value = item.farmerId;
+      }
+      if (item.crop && $('offerCrop')) {
+        $('offerCrop').value = item.crop;
+      }
+      if ($('offerQuantity')) {
+        $('offerQuantity').value = item.quantity || 10;
+      }
+      if ($('offerPrice')) {
+        $('offerPrice').value = item.expectedPrice || 2400;
+      }
+      updateEstimate();
+      dialog.showModal();
+    }
+
+    async function loadMarketplaceListings() {
+      try {
+        const res = await api('/api/listings');
+        renderMarketplaceListings(res.items || []);
+      } catch (err) {
+        console.error('Marketplace error:', err);
+      }
+    }
+
+    let activeEscrowOrderObj = null;
+
+    function openEscrowModal(order) {
+      activeEscrowOrderId = order.id;
+      activeEscrowOrderObj = order;
+      $('escrowSubtitle').textContent = `Order ${order.id.slice(0,8)} · ${order.quantity} quintals of ${order.cropName}`;
+      $('escrowAmountText').textContent = money(order.totalAmount);
+      // Generate clean QR code for simulated UPI
+      const qrData = encodeURIComponent(`upi://pay?pa=escrow@agrismart&pn=AgriSmartEscrow&am=${order.totalAmount}&cu=INR`);
+      $('escrowQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${qrData}`;
+      $('escrowDialog').showModal();
+    }
+
+    $('payRazorpayBtn').onclick = async () => {
+      if (!activeEscrowOrderId) return;
+      $('payRazorpayBtn').disabled = true;
+      try {
+        const orderData = await api('/api/payments/create-order', {
+          method: 'POST',
+          body: JSON.stringify({ orderId: activeEscrowOrderId })
+        });
+
+        // 1. Live Razorpay Flow (if credentials configured)
+        if (orderData.keyId && window.Razorpay) {
+          const rzp = new window.Razorpay({
+            key: orderData.keyId,
+            amount: orderData.amount,
+            currency: orderData.currency || 'INR',
+            name: 'AgriSmart Escrow',
+            description: `Payment for Order #${activeEscrowOrderId.slice(0, 8)}`,
+            order_id: orderData.id,
+            handler: async function (response) {
+              try {
+                await api('/api/payments/verify', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    orderId: activeEscrowOrderId,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature
+                  })
+                });
+                $('escrowDialog').close();
+                message(window.currentLanguage === 'hi' ? 'रेज़रपे भुगतान सफलतापूर्वक सुरक्षित हुआ ✅' : 'Razorpay payment successfully secured in escrow ✅');
+                await loadOrders();
+              } catch (verifyErr) {
+                alert('Payment verification failed: ' + verifyErr.message);
+              }
+            },
+            prefill: {
+              name: currentUser?.name || 'AgriSmart Buyer',
+              email: currentUser?.email || ''
+            },
+            theme: { color: '#08743f' }
+          });
+          rzp.open();
+          return;
+        }
+
+        // 2. Sandbox / Instant Simulated Payment Flow
+        await api('/api/payments/verify', {
+          method: 'POST',
+          body: JSON.stringify({
+            orderId: activeEscrowOrderId,
+            paymentOrderId: orderData.id,
+            paymentId: 'pay_sim_' + Math.random().toString(36).slice(2, 10)
+          })
+        });
+        $('escrowDialog').close();
+        message(window.currentLanguage === 'hi' ? 'एस्क्रो में सैंडबॉक्स भुगतान सुरक्षित हो गया ✅' : 'Sandbox payment secured in escrow ✅');
+        await loadOrders();
+      } catch (err) {
+        alert(err.message || 'Payment initiation failed.');
+      } finally {
+        $('payRazorpayBtn').disabled = false;
+      }
+    };
+
+    $('confirmEscrowBtn').onclick = async () => {
+      if (!activeEscrowOrderId) return;
+      $('confirmEscrowBtn').disabled = true;
+      try {
+        await api('/api/payments/verify', {
+          method: 'POST',
+          body: JSON.stringify({
+            orderId: activeEscrowOrderId,
+            paymentOrderId: 'order_upi_' + Math.random().toString(36).slice(2, 10),
+            paymentId: 'pay_upi_' + Math.random().toString(36).slice(2, 10)
+          })
+        });
+        $('escrowDialog').close();
+        message(window.currentLanguage === 'hi' ? 'यूपीआई भुगतान एस्क्रो में सत्यापित हो गया ✅' : 'UPI payment verified and held in escrow ✅');
+        await loadOrders();
+      } catch(err) {
+        alert(err.message);
+      } finally {
+        $('confirmEscrowBtn').disabled = false;
+      }
+    };
+
+    async function openChat(offerId, otherName, cropName) {
+      currentChatOfferId = offerId;
+      $('chatTitle').textContent = `💬 ${cropName} · ${otherName}`;
+      $('chatDialog').showModal();
+      await loadChatMessages();
+    }
+
+    async function loadChatMessages() {
+      try {
+        const res = await api(`/api/offers/${encodeURIComponent(currentChatOfferId)}/messages`);
+        const box = $('chatMessages');
+        box.replaceChildren();
+        if (!res.items?.length) {
+          box.innerHTML = '<p style="color:#5B6E68;text-align:center;">No messages yet. Send a message to start negotiation.</p>';
+          return;
+        }
+        res.items.forEach(m => {
+          const div = document.createElement('div');
+          const isMe = m.senderRole === 'buyer';
+          div.style.cssText = `padding:8px 12px;border-radius:8px;max-width:80%;align-self:${isMe?'flex-end':'flex-start'};background:${isMe?'#e1f0e7':'#fff'};border:1px solid #dce8e0;`;
+          const sender = document.createElement('strong');
+          sender.textContent = `${m.senderName} (${m.senderRole}):`;
+          const timestamp = document.createElement('div');
+          timestamp.style.cssText = 'font-size:11px;color:#5B6E68;text-align:right;';
+          timestamp.textContent = new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+          div.append(sender, document.createTextNode(` ${m.text}`), timestamp);
+          box.append(div);
+        });
+        box.scrollTop = box.scrollHeight;
+      } catch(e) {}
+    }
+
+    $('chatForm').onsubmit = async e => {
+      e.preventDefault();
+      const txt = $('chatInput').value.trim();
+      if (!txt) return;
+      $('chatInput').value = '';
+      try {
+        await api(`/api/offers/${encodeURIComponent(currentChatOfferId)}/messages`, {
+          method: 'POST',
+          body: JSON.stringify({ text: txt })
+        });
+        await loadChatMessages();
+      } catch(err) {
+        alert(err.message);
+      }
+    };
+
+    function renderNotifications(items) {
+      cachedNotifs = items || [];
+      const list = $('notificationList');
+      list.replaceChildren();
+      if (!cachedNotifs.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noNotifications');
+        list.append(e);
+        return;
+      }
+      const locale = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+      for (const n of cachedNotifs) {
+        const c = document.createElement('article');
+        c.className = 'offer-item';
+        const h = document.createElement('strong');
+        h.textContent = (n.read ? '' : '🔔 ') + n.title;
+        const p = document.createElement('p');
+        p.textContent = n.message;
+        const d = document.createElement('p');
+        d.textContent = new Date(n.createdAt).toLocaleString(locale);
+        c.append(h, p, d);
+        list.append(c);
+      }
+    }
+
+    function openOffer(key) {
+      $('offerCrop').value = key;
+      $('offerPrice').value = '';
+      $('offerQuantity').value = '50';
+      $('offerBonus').value = '0';
+      $('offerDate').value = '';
+      const now = new Date();
+      $('offerDate').min = now.toISOString().slice(0, 10);
+      updateEstimate();
+      dialog.showModal();
+    }
+
+    function updateEstimate() {
+      const q = Number($('offerQuantity').value) || 0,
+            p = Number($('offerPrice').value) || 0,
+            b = Number($('offerBonus').value) || 0;
+      $('offerDate').required = b > 0;
+      const tmpl = window.t('totalIfOnTime');
+      $('offerEstimate').textContent = tmpl.replace('{price}', money(p + b)).replace('{bonus}', money(q * b));
+    }
+
+    async function loadOrders() {
+      renderOrders((await api('/api/orders')).items || []);
+    }
+
+    async function loadData() {
+      const [cropRes, farmerRes, offerRes] = await Promise.all([
+        api('/api/crops'),
+        api('/api/farmers'),
+        api('/api/offers')
+      ]);
+
+      crops = cropRes.items || {};
+      farmers = farmerRes.items || [];
+      const offers = offerRes.items || [];
+
+      cropCards = Object.entries(crops).map(([key, c]) => ({ key, name: c.n || key }));
+
+      $('cropCount').textContent = cropCards.length;
+
+      $('offerCrop').replaceChildren(...cropCards.map(x => {
+        const o = document.createElement('option');
+        o.value = x.key;
+        o.textContent = window.t(x.key) || x.name;
+        return o;
+      }));
+
+      $('offerFarmer').replaceChildren(...farmers.map(f => {
+        const o = document.createElement('option');
+        o.value = f.id;
+        o.textContent = f.name + ' — ' + f.district;
+        return o;
+      }));
+
+      renderCrops(search.value);
+      renderOffers(offers);
+      await loadMarketplaceListings();
+      await loadOrders();
+      renderNotifications((await api('/api/notifications')).items || []);
+    }
+
+    $('offerCrop').onchange = () => {
+      $('offerPrice').value = '';
+      updateEstimate();
+    };
+
+    for (const id of ['offerQuantity', 'offerPrice', 'offerBonus']) {
+      $(id).addEventListener('input', updateEstimate);
+    }
+
+    $('cancelOffer').onclick = () => dialog.close();
+    search.oninput = () => renderCrops(search.value);
+
+    offerForm.onsubmit = async e => {
+      e.preventDefault();
+      const btn = offerForm.querySelector('[type=submit]');
+      btn.disabled = true;
+      try {
+        const r = await api('/api/offers', {
+          method: 'POST',
+          body: JSON.stringify({
+            farmerId: $('offerFarmer').value,
+            crop: $('offerCrop').value,
+            quantity: Number($('offerQuantity').value),
+            price: Number($('offerPrice').value),
+            earlyBonusPerQuintal: Number($('offerBonus').value || 0),
+            deliveryBy: $('offerDate').value || null
+          })
+        });
+        dialog.close();
+        const successMsg = window.currentLanguage === 'hi'
+          ? `प्रस्ताव ${r.farmerName} को भेज दिया गया।`
+          : `Offer sent to ${r.farmerName}.`;
+        message(successMsg);
+        await loadData();
+      } catch (e) {
+        message(e.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    $('refreshListings').onclick = () => loadMarketplaceListings().catch(e => message(e.message, true));
+    $('refreshOffers').onclick = () => loadData().catch(e => message(e.message, true));
+    $('refreshOrders').onclick = () => loadOrders().catch(e => message(e.message, true));
+    $('readNotifications').onclick = async () => {
+      try {
+        await api('/api/notifications/read', { method: 'PATCH' });
+        renderNotifications((await api('/api/notifications')).items || []);
+      } catch (e) {
+        message(e.message, true);
+      }
+    };
+
+    // Reactively refresh UI when language is switched
+    document.addEventListener('agrismart-lang-changed', () => {
+      renderCrops(search.value);
+      renderOffers(cachedOffers);
+      renderOrders(cachedOrders);
+      renderMarketplaceListings(cachedListings);
+      renderNotifications(cachedNotifs);
+      if (cropCards.length) {
+        $('offerCrop').replaceChildren(...cropCards.map(x => {
+          const o = document.createElement('option');
+          o.value = x.key;
+          o.textContent = window.t(x.key) || x.name;
+          return o;
+        }));
+      }
+    });
+
+    async function init() {
+      const me = await requireAuth('buyer');
+      if (!me) return;
+      addAuthNav(me.user.role);
+      if ($('authBuyerName')) $('authBuyerName').textContent = me.user.name;
+      if ($('authBuyerEmail')) $('authBuyerEmail').textContent = `${me.user.email} · Role: Verified Mandi Procurement Agent`;
+      await loadData();
+    }
+
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+    init().catch(e => message(e.message, true));
+  </script>
+</body>
+</html>

@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2A7A4B">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#F6F8F5;--card:#fff;--ink:#14312B;--mut:#5B6E68;--line:#D9E2DD;--ac:#2A7A4B;--acs:#E1F0E7;--warn:#FBF1D2;box-sizing:border-box}
+    @media(prefers-color-scheme:dark){:root{--bg:#0E1C19;--card:#162824;--ink:#E6F0EC;--mut:#9DB3AB;--line:#2A403A;--ac:#5CC38A;--acs:#173A2A;--warn:#3A3010}}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Mukta,system-ui,sans-serif}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px max(20px,calc((100% - 1040px)/2));background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+    .brand{font-size:24px;font-weight:800;white-space:nowrap}.brand span{color:var(--ac)}
+    nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    nav a{color:var(--mut);text-decoration:none;font-weight:600;padding:7px 12px;border-radius:6px;transition:background 0.2s}
+    nav a:hover,nav a[aria-current=page]{color:var(--ac);background:var(--acs)}
+    .lang-picker{display:inline-flex;align-items:center;background:#054728;border-radius:8px;padding:4px 10px;color:white;}
+    .lang-picker select{background:transparent;color:white;border:none;font-weight:bold;cursor:pointer;outline:none;font-size:14px;padding:0;margin:0;}
+    .lang-picker select option{background:#075c35;color:white;}
+    main{max-width:1040px;margin:auto;padding:30px 20px 50px}
+    .eyebrow{color:var(--ac);font-weight:700;margin:0 0 2px}
+    h1{font-size:clamp(28px,5vw,38px);line-height:1.15;margin:0 0 5px;font-weight:800}
+    .intro{color:var(--mut);margin:0 0 18px}
+    .note{background:var(--warn);border:1px solid #E0A100;border-radius:8px;padding:12px 14px;margin:0 0 18px;font-size:14px;line-height:1.6;}
+    .profile-panel,.offer-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0}
+    .profile-grid{display:grid;grid-template-columns:minmax(190px,1fr) minmax(220px,2fr);gap:16px;align-items:end}
+    label{display:block;font-weight:600;color:var(--mut)}
+    input,select{display:block;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin-top:3px}
+    .dashboard-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:24px 0 30px}
+    .card{padding:20px 14px;border-radius:12px;background:#f1f8e9;text-align:center;border:1px solid var(--line);color:#14312B}
+    .card h2{font-size:15px;color:#5B6E68;margin:0 0 5px;font-weight:600}
+    .card p{font-size:26px;font-weight:bold;margin:0}
+    .card small{color:#5B6E68}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:10px}
+    h2{margin:0;font-size:22px}
+    .section-head p{margin:2px 0 0;color:var(--mut)}
+    .offer-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+    .offer-card h3{font-size:19px;margin:0 0 4px}
+    .offer-card p{margin:4px 0;color:var(--mut)}
+    .status{display:inline-block;border-radius:99px;padding:2px 10px;background:var(--warn);font-size:13px;font-weight:700;text-transform:capitalize}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    button,.button{padding:9px 16px;border:0;border-radius:8px;cursor:pointer;background:var(--ac);color:#fff;text-decoration:none;font:600 15px Mukta,system-ui,sans-serif}
+    .button{display:inline-block}.secondary{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+    button:hover,.button:hover{filter:brightness(.94)}button:disabled{opacity:.55;cursor:wait}
+    .empty{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px;color:var(--mut)}
+    .message{color:var(--ac);font-weight:700}.error{color:#a52c24}
+    footer{color:var(--mut);font-size:13px;margin-top:30px;line-height:1.6;}
+    @media(max-width:760px){header{align-items:flex-start;flex-direction:column;padding:12px 18px}.dashboard-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.offer-list{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}}
+    @media print{body *{visibility:hidden}#invoiceDialog,#invoiceDialog *{visibility:visible}#invoiceDialog{position:fixed;left:0;top:0;width:100%;max-width:100%;border:none;box-shadow:none;padding:16px;background:#fff}.no-print{display:none !important}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand" data-i18n="brand">🌾 Agri<span>smart</span></div>
+    <nav aria-label="Main navigation">
+      <a href="index.html" data-i18n="home">Home</a>
+      <a href="farmer.html" aria-current="page" data-i18n="farmerDash">Farmer Dashboard</a>
+      <a href="buyer.html" data-i18n="buyerDash">Buyer Dashboard</a>
+      <div class="lang-picker">
+        <span style="font-size:15px;margin-right:4px;">🌐</span>
+        <select id="langSelect" class="lang-select" onchange="setLanguage(this.value)">
+          <option value="hi">हिंदी (HI)</option>
+          <option value="en">English (EN)</option>
+        </select>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Authorized Account Banner -->
+    <div id="authAccountBanner" style="background:#e1f0e7;border:1px solid #c2dbcd;border-radius:10px;padding:12px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">🛡️</span>
+        <div>
+          <div style="font-weight:bold;color:#08743f;font-size:15px;">
+            🌾 <span id="authFarmerName">Farmer Account</span> · <span style="background:#08743f;color:white;padding:2px 8px;border-radius:99px;font-size:11px;">Verified Role</span>
+          </div>
+          <div id="authFarmerEmail" style="font-size:13px;color:#5b6e68;margin-top:2px;">Authenticated via AgriSmart Secure Cloud</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="btn" style="background:#075c35;color:white;border:none;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;display:inline-flex;align-items:center;gap:6px;" onclick="switchRole('buyer')">
+          🏢 <span data-i18n="switchToBuyer">Switch to Buyer Dashboard</span>
+        </button>
+        <button type="button" class="secondary" style="color:#c62828;border-color:#ffcdd2;padding:6px 14px;font-size:13px;" onclick="logout()">
+          🚪 Logout
+        </button>
+      </div>
+    </div>
+
+    <p class="eyebrow" data-i18n="farmerMarketplaceEyebrow">BUYER–FARMER MARKETPLACE</p>
+    <h1 data-i18n="farmerTitle">Farmer Dashboard 👨‍🌾</h1>
+    <p class="intro" data-i18n="farmerIntro">Review offers addressed to your farmer profile and respond to buyers.</p>
+    <p class="note" data-i18n="farmerNote">Your farmer dashboard is protected by your account. Offers, orders, reports and notifications are stored on the AgriSmart backend.</p>
+
+    <section class="profile-panel" aria-labelledby="profileHeading">
+      <h2 id="profileHeading" data-i18n="yourProfile">Your farmer profile</h2>
+      <div id="profilePicker" class="profile-grid" hidden><p id="profileName"></p></div>
+      <form id="profileForm" class="profile-grid">
+        <label><span data-i18n="farmProfileName">Farm profile name</span><input id="farmerName" name="name" autocomplete="name" required maxlength="80"></label>
+        <div>
+          <label><span data-i18n="districtOrTown">District or town</span><input id="farmerDistrict" name="district" list="farmerLocations" autocomplete="address-level2" required maxlength="80" value="Sehore"><datalist id="farmerLocations"></datalist></label>
+          <button type="button" id="detectFarmerLocBtn" class="secondary" style="margin-top:6px;font-size:12px;padding:4px 8px;width:auto;" onclick="detectFarmerDistrict()">📍 <span data-i18n="detectFarmerLocation">Auto-detect District</span></button>
+        </div>
+        <button type="submit" id="createProfile" data-i18n="createProfileBtn">Create farmer profile</button>
+      </form>
+      <p id="profileMessage" class="message" role="status"></p>
+    </section>
+
+    <section class="dashboard-cards" aria-label="Offer summary">
+      <article class="card">
+        <h2 data-i18n="pendingOffers">🤝 Pending Offers</h2>
+        <p id="pendingCount">0</p>
+        <small data-i18n="waitingResponse">waiting for your response</small>
+      </article>
+      <article class="card">
+        <h2 data-i18n="accepted">✅ Accepted</h2>
+        <p id="acceptedCount">0</p>
+        <small data-i18n="acceptedSub">accepted offers</small>
+      </article>
+      <article class="card">
+        <h2 data-i18n="rejected">↩️ Rejected</h2>
+        <p id="rejectedCount">0</p>
+        <small data-i18n="rejectedSub">declined offers</small>
+      </article>
+      <article class="card">
+        <h2 data-i18n="quantityOffered">📦 Quantity Offered</h2>
+        <p id="quantityCount">0</p>
+        <small data-i18n="quintalsInPending">quintals in pending offers</small>
+      </article>
+      <article class="card">
+        <h2 data-i18n="ordersCard">📋 Orders</h2>
+        <p id="orderCount">0</p>
+        <small data-i18n="confirmedOrdersSub">confirmed orders</small>
+      </article>
+    </section>
+
+    <!-- Produce Marketplace / Sell Crop Section -->
+    <section class="profile-panel" aria-labelledby="produceListingHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="produceListingHeading" data-i18n="postProduceTitle">🌾 Post Harvest for Sale (Marketplace)</h2>
+          <p data-i18n="postProduceSub">List your available crop quantity so verified buyers can send purchase offers.</p>
+        </div>
+      </div>
+      <form id="produceListingForm" class="profile-grid">
+        <label><span data-i18n="cropLabel">Crop</span><select id="listingCrop" required>
+          <option value="wheat">Wheat / गेहूँ</option>
+          <option value="chana">Chickpea (Chana) / चना</option>
+          <option value="mustard">Mustard / सरसों</option>
+          <option value="soybean">Soybean / सोयाबीन</option>
+          <option value="maize">Maize / मक्का</option>
+          <option value="lentil">Lentil (Masoor) / मसूर</option>
+          <option value="paddy">Paddy / Rice / धान</option>
+          <option value="cotton">Cotton / कपास</option>
+          <option value="onion">Onion / प्याज</option>
+          <option value="potato">Potato / आलू</option>
+          <option value="garlic">Garlic / लहसुन</option>
+          <option value="moong">Green Gram (Moong) / मूंग</option>
+          <option value="urad">Black Gram (Urad) / उड़द</option>
+          <option value="groundnut">Groundnut (Peanut) / मूंगफली</option>
+          <option value="turmeric">Turmeric / हल्दी</option>
+        </select></label>
+        <label><span data-i18n="cropVariety">Variety / Grade</span><input id="listingVariety" placeholder="e.g. Sharbati, Lokwan, Desi" maxlength="60"></label>
+        <label><span data-i18n="quantityQuintals">Quantity (quintals)</span><input id="listingQuantity" type="number" min="0.1" step="0.1" required value="20"></label>
+        <label><span data-i18n="expectedPrice">Expected Rate (₹/quintal)</span><input id="listingPrice" type="number" min="100" step="10" required value="2400"></label>
+        <label><span data-i18n="harvestDate">Harvest / Available Date</span><input id="listingDate" type="date"></label>
+        <label><span data-i18n="listingNotes">Quality / Delivery Notes</span><input id="listingNotes" placeholder="e.g. Dry clean grain, moisture <12%, Sehore yard" maxlength="120"></label>
+        <button type="submit" id="submitListingBtn" data-i18n="submitListing">Publish Crop Listing</button>
+      </form>
+      <p id="listingMsg" class="message" role="status"></p>
+
+      <div style="margin-top:22px;">
+        <h3 style="margin:0 0 10px;font-size:18px;" data-i18n="myListings">My Active Produce Listings</h3>
+        <div id="myListingsContainer" class="offer-list">
+          <p class="empty" data-i18n="noListingsYet">No produce listings published yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="inboxHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="inboxHeading" data-i18n="offersForYou">Offers for you</h2>
+          <p data-i18n="offersSub">Accept or reject an offer to update its status for the buyer.</p>
+        </div>
+        <button type="button" id="refreshOffers" class="secondary" data-i18n="refreshOffers">Refresh offers</button>
+      </div>
+      <div id="offerList" class="offer-list" aria-live="polite">
+        <p class="empty" data-i18n="noOffersYet">Select or create a farmer profile to view its offers.</p>
+      </div>
+      <p id="actionMessage" class="message" role="status"></p>
+    </section>
+
+    <section class="profile-panel" aria-labelledby="reportHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="reportHeading" data-i18n="profitReportTitle">Farm profitability report</h2>
+          <p style="margin:2px 0 0;font-size:13px;color:var(--mut);">Calculate crop economics, estimate net returns, and save reports.</p>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <label><span data-i18n="cropLabel">Crop</span><select id="reportCrop">
+          <option value="wheat">Wheat / गेहूँ</option>
+          <option value="chana">Chickpea (Chana) / चना</option>
+          <option value="mustard">Mustard / सरसों</option>
+          <option value="soybean">Soybean / सोयाबीन</option>
+          <option value="maize">Maize / मक्का</option>
+          <option value="lentil">Lentil (Masoor) / मसूर</option>
+          <option value="paddy">Paddy / Rice / धान</option>
+          <option value="cotton">Cotton / कपास</option>
+          <option value="onion">Onion / प्याज</option>
+          <option value="potato">Potato / आलू</option>
+          <option value="garlic">Garlic / लहसुन</option>
+          <option value="moong">Green Gram (Moong) / मूंग</option>
+          <option value="urad">Black Gram (Urad) / उड़द</option>
+          <option value="groundnut">Groundnut (Peanut) / मूंगफली</option>
+          <option value="turmeric">Turmeric / हल्दी</option>
+        </select></label>
+        <label><span data-i18n="areaAcres">Area (acres)</span><input id="reportArea" type="number" min="0.1" step="0.1" value="1"></label>
+        <label><span data-i18n="productionQ">Production (quintals)</span><input id="reportProduction" type="number" min="0" step="0.1" value="10"></label>
+        <label><span data-i18n="expensesRs">Expenses (₹)</span><input id="reportExpenses" type="number" min="0" step="1" value="10000"></label>
+        <label><span data-i18n="salePriceRs">Sale price (₹/quintal)</span><input id="reportPrice" type="number" min="0" step="1" value="2500"></label>
+        <button type="button" id="saveReport" data-i18n="saveReport">Save report</button>
+      </div>
+
+      <!-- Live Calculation Preview -->
+      <div id="reportLiveEstimate" style="background:#eef6f1;border:1px solid #c2dbcd;border-radius:8px;padding:12px 16px;margin-top:14px;font-size:14px;color:#075c35;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span style="font-size:12px;color:#5b6e68;text-transform:uppercase;font-weight:bold;">Estimated Revenue:</span>
+          <strong id="reportEstimateRevenue" style="font-size:17px;display:block;color:#08743f;">₹25,000</strong>
+        </div>
+        <div>
+          <span style="font-size:12px;color:#5b6e68;text-transform:uppercase;font-weight:bold;">Net Profit / Margin:</span>
+          <strong id="reportEstimateProfit" style="font-size:17px;display:block;color:#08743f;">+₹15,000</strong>
+        </div>
+        <div>
+          <span style="font-size:12px;color:#5b6e68;text-transform:uppercase;font-weight:bold;">Profit per Acre:</span>
+          <strong id="reportEstimatePerAcre" style="font-size:17px;display:block;color:#08743f;">₹15,000 / acre</strong>
+        </div>
+      </div>
+      <p id="reportResult" class="message" role="status"></p>
+
+      <!-- Saved Reports History Section -->
+      <div style="margin-top:26px;border-top:1px solid var(--line);padding-top:20px;">
+        <div class="section-head">
+          <div>
+            <h3 style="margin:0 0 4px;font-size:19px;" data-i18n="savedReportsTitle">📋 Saved Profitability Reports</h3>
+            <p style="margin:0;font-size:13px;color:var(--mut);" data-i18n="savedReportsDesc">Track and review your saved crop economic returns and net margins.</p>
+          </div>
+          <button type="button" id="refreshReportsBtn" class="secondary" style="font-size:13px;padding:6px 14px;" onclick="loadReports()">🔄 <span data-i18n="refresh">Refresh</span></button>
+        </div>
+
+        <!-- Saved Reports KPI Summary -->
+        <div id="reportSummaryCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0;" hidden>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;">
+            <small style="color:var(--mut);">Saved Reports</small>
+            <div id="statReportCount" style="font-size:20px;font-weight:bold;color:var(--ac);">0</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;">
+            <small style="color:var(--mut);">Total Revenue</small>
+            <div id="statTotalRevenue" style="font-size:20px;font-weight:bold;color:#08743f;">₹0</div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;">
+            <small style="color:var(--mut);">Total Net Profit</small>
+            <div id="statTotalProfit" style="font-size:20px;font-weight:bold;color:#08743f;">₹0</div>
+          </div>
+        </div>
+
+        <div id="savedReportsList" class="offer-list" style="margin-top:12px;">
+          <p class="empty" data-i18n="noSavedReports">No profitability reports saved yet. Fill out the calculator above and click Save Report.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="profile-panel" aria-labelledby="ordersHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="ordersHeading" data-i18n="ordersTitle">Orders</h2>
+          <p data-i18n="ordersDesc">Accepted offers automatically become confirmed orders.</p>
+        </div>
+        <button type="button" id="refreshOrders" class="secondary" data-i18n="refreshOrders">Refresh orders</button>
+      </div>
+      <div id="orderList" class="offer-list">
+        <p class="empty" data-i18n="loadingOrders">Loading orders…</p>
+      </div>
+    </section>
+
+    <footer data-i18n="farmerDisclaimer">
+      Market prices are clearly labelled demo references. Payment and delivery are represented by order status fields; connect a payment/delivery provider for real transactions.
+    </footer>
+  </main>
+
+  <!-- Counter-Offer Dialog -->
+  <dialog id="counterDialog" style="max-width:440px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:22px;background:#fff;color:#14312B;margin:auto;">
+    <h3 style="margin-bottom:8px;">💬 Propose Counter Offer</h3>
+    <p id="counterDesc" style="color:#5B6E68;margin-bottom:14px;font-size:14px;"></p>
+    <label>Your proposed rate (₹ / quintal):
+      <input type="number" id="counterInput" min="100" step="10" required style="font-size:16px;font-weight:bold;margin-top:4px;">
+    </label>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+      <button type="button" class="secondary" onclick="$('counterDialog').close()">Cancel</button>
+      <button type="button" id="submitCounterBtn">Submit Counter</button>
+    </div>
+  </dialog>
+
+  <!-- Negotiation Chat Dialog -->
+  <dialog id="chatDialog" style="max-width:520px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:22px;background:#fff;color:#14312B;margin:auto;">
+    <h3 id="chatTitle" style="margin-bottom:10px;">💬 Negotiation Chat</h3>
+    <div id="chatMessages" style="height:220px;overflow-y:auto;background:#f6f8f5;border-radius:8px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;font-size:14px;"></div>
+    <form id="chatForm" style="display:flex;gap:8px;">
+      <input type="text" id="chatInput" placeholder="Type your message…" required style="flex:1;">
+      <button type="submit">Send</button>
+      <button type="button" class="secondary" onclick="$('chatDialog').close()">Close</button>
+    </form>
+  </dialog>
+
+  <!-- Mandi Trade Invoice Dialog -->
+  <dialog id="invoiceDialog" style="max-width:540px;width:calc(100% - 32px);border:1px solid #D9E2DD;border-radius:14px;padding:24px;background:#fff;color:#14312B;margin:auto;">
+    <div id="invoicePrintArea">
+      <div style="text-align:center;border-bottom:2px dashed #2A7A4B;padding-bottom:12px;margin-bottom:14px;">
+        <h2 style="margin:0;color:#2A7A4B;font-size:20px;">🌾 AGRISMART MANDI TRADE RECEIPT</h2>
+        <p style="margin:4px 0 0;font-size:12px;color:#5B6E68;">National e-Mandi Benchmark Compliance Bill / व्यापार पर्ची</p>
+      </div>
+      <div id="invoiceContent" style="font-size:14px;line-height:1.6;"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;border-top:1px solid #eee;padding-top:12px;" class="no-print">
+      <button type="button" class="secondary" onclick="$('invoiceDialog').close()">Close</button>
+      <button type="button" onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+  </dialog>
+
+  <!-- Load i18n BEFORE auth and page logic -->
+  <script src="i18n.js"></script>
+  <script src="auth.js"></script>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let selectedFarmerId = '';
+    let currentChatOfferId = '';
+    let currentCounterOfferId = '';
+    let farmers = [];
+    let crops = {};
+    let cachedOffers = [];
+    let cachedOrders = [];
+    let cachedListings = [];
+
+    const money = v => '₹' + Number(v || 0).toLocaleString('en-IN');
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+    function msg(el, text, error = false) {
+      el.textContent = text;
+      el.className = error ? 'message error' : 'message';
+    }
+
+    function renderOffers(items) {
+      cachedOffers = items || [];
+      const list = $('offerList');
+      list.replaceChildren();
+      const pending = cachedOffers.filter(x => x.status === 'pending');
+      const accepted = cachedOffers.filter(x => x.status === 'accepted');
+      const rejected = cachedOffers.filter(x => x.status === 'rejected');
+
+      $('pendingCount').textContent = pending.length;
+      $('acceptedCount').textContent = accepted.length;
+      $('rejectedCount').textContent = rejected.length;
+      $('quantityCount').textContent = pending.reduce((s, x) => s + Number(x.quantity || 0), 0);
+
+      if (!cachedOffers.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noOffersFound');
+        list.append(e);
+        return;
+      }
+
+      for (const item of [...cachedOffers].reverse()) {
+        const card = document.createElement('article');
+        card.className = 'offer-card';
+        const h = document.createElement('h3');
+        const translatedCrop = window.t(item.crop) || item.cropName || item.crop;
+        h.textContent = '🌾 ' + translatedCrop;
+
+        const st = document.createElement('span');
+        st.className = 'status';
+        st.textContent = window.t('status' + item.status[0].toUpperCase() + item.status.slice(1)) || item.status;
+
+        const p = document.createElement('p');
+        p.textContent = `${window.t('buyerLabel')} ${item.buyerName || 'Buyer'} · ${item.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'} · ${money(item.totalPricePerQuintal)}/${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintal'}`;
+
+        const when = document.createElement('p');
+        const locale = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+        when.textContent = `${window.t('sentLabel')} ${new Date(item.createdAt).toLocaleString(locale)}`;
+        card.append(h, st, p, when);
+
+        if (item.deliveryBy) {
+          const d = document.createElement('p');
+          d.textContent = `${window.t('deliverByLabel')} ${new Date(item.deliveryBy + 'T00:00:00').toLocaleDateString(locale)}`;
+          card.append(d);
+        }
+
+        if (item.status === 'countered' && item.counterPrice) {
+          const counterBox = document.createElement('div');
+          counterBox.style.cssText = 'background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:8px 12px;margin:8px 0;font-size:13px;color:#795548;';
+          counterBox.innerHTML = `<span><strong>💬 ${window.currentLanguage === 'hi' ? 'काउंटर भाव भेजा गया:' : 'Counter-Offer Sent:'}</strong> ₹${escapeHtml(item.counterPrice)}/q <em>(${window.currentLanguage === 'hi' ? 'खरीदार की प्रतिक्रिया का इंतजार' : 'Awaiting buyer decision'})</em></span>`;
+          card.append(counterBox);
+        }
+
+        if (item.status === 'pending') {
+          const a = document.createElement('div');
+          a.className = 'actions';
+          for (const status of ['accepted', 'rejected']) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = status === 'accepted' ? window.t('acceptBtn') : window.t('rejectBtn');
+            if (status === 'rejected') b.className = 'secondary';
+            b.onclick = () => respond(item.id, status, b);
+            a.append(b);
+          }
+          const counterBtn = document.createElement('button');
+          counterBtn.type = 'button';
+          counterBtn.className = 'secondary';
+          counterBtn.textContent = window.t('counterOfferBtn');
+          counterBtn.onclick = () => openCounter(item);
+          a.append(counterBtn);
+
+          const chatBtn = document.createElement('button');
+          chatBtn.type = 'button';
+          chatBtn.className = 'secondary';
+          chatBtn.textContent = window.t('chatBtn');
+          chatBtn.onclick = () => openChat(item.id, item.buyerName || 'Buyer', item.cropName || item.crop);
+          a.append(chatBtn);
+
+          card.append(a);
+        } else {
+          const a = document.createElement('div');
+          a.className = 'actions';
+          const chatBtn = document.createElement('button');
+          chatBtn.type = 'button';
+          chatBtn.className = 'secondary';
+          chatBtn.textContent = window.t('chatBtn');
+          chatBtn.onclick = () => openChat(item.id, item.buyerName || 'Buyer', item.cropName || item.crop);
+          a.append(chatBtn);
+          card.append(a);
+        }
+        list.append(card);
+      }
+    }
+
+    async function respond(id, status, button) {
+      button.disabled = true;
+      try {
+        await api('/api/offers/' + encodeURIComponent(id), {
+          method: 'PUT',
+          body: JSON.stringify({ status })
+        });
+        const successText = status === 'accepted'
+          ? (window.currentLanguage === 'hi' ? 'प्रस्ताव स्वीकार कर लिया गया। कन्फर्म ऑर्डर बना दिया गया है।' : 'Offer accepted. A confirmed order was created.')
+          : (window.currentLanguage === 'hi' ? 'प्रस्ताव अस्वीकार कर दिया गया।' : 'Offer rejected.');
+        msg($('actionMessage'), successText);
+        await loadAll();
+      } catch (e) {
+        msg($('actionMessage'), e.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function openCounter(item) {
+      currentCounterOfferId = item.id;
+      $('counterDesc').textContent = `Buyer ${item.buyerName || 'Buyer'} offered ₹${item.price}/quintal for ${item.quantity} quintals of ${item.cropName || item.crop}.`;
+      $('counterInput').value = item.price + 50;
+      $('counterDialog').showModal();
+    }
+
+    $('submitCounterBtn').onclick = async () => {
+      const val = Number($('counterInput').value);
+      if (!val || val <= 0) return alert('Please enter a valid counter price.');
+      $('submitCounterBtn').disabled = true;
+      try {
+        await api(`/api/offers/${encodeURIComponent(currentCounterOfferId)}/counter`, {
+          method: 'POST',
+          body: JSON.stringify({ counterPrice: val })
+        });
+        $('counterDialog').close();
+        msg($('actionMessage'), window.currentLanguage === 'hi' ? 'काउंटर ऑफर भेज दिया गया।' : 'Counter-offer sent to buyer.');
+        await loadAll();
+      } catch(err) {
+        alert(err.message);
+      } finally {
+        $('submitCounterBtn').disabled = false;
+      }
+    };
+
+    async function openChat(offerId, buyerName, cropName) {
+      currentChatOfferId = offerId;
+      $('chatTitle').textContent = `💬 ${cropName} · ${buyerName}`;
+      $('chatDialog').showModal();
+      await loadChatMessages();
+    }
+
+    async function loadChatMessages() {
+      try {
+        const res = await api(`/api/offers/${encodeURIComponent(currentChatOfferId)}/messages`);
+        const box = $('chatMessages');
+        box.replaceChildren();
+        if (!res.items?.length) {
+          box.innerHTML = '<p style="color:#5B6E68;text-align:center;">No messages yet. Send a message to start negotiation.</p>';
+          return;
+        }
+        res.items.forEach(m => {
+          const div = document.createElement('div');
+          const isMe = m.senderRole === 'farmer';
+          div.style.cssText = `padding:8px 12px;border-radius:8px;max-width:80%;align-self:${isMe?'flex-end':'flex-start'};background:${isMe?'#e1f0e7':'#fff'};border:1px solid #dce8e0;`;
+          const sender = document.createElement('strong');
+          sender.textContent = `${m.senderName} (${m.senderRole}):`;
+          const timestamp = document.createElement('div');
+          timestamp.style.cssText = 'font-size:11px;color:#5B6E68;text-align:right;';
+          timestamp.textContent = new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+          div.append(sender, document.createTextNode(` ${m.text}`), timestamp);
+          box.append(div);
+        });
+        box.scrollTop = box.scrollHeight;
+      } catch(e) {}
+    }
+
+    $('chatForm').onsubmit = async e => {
+      e.preventDefault();
+      const txt = $('chatInput').value.trim();
+      if (!txt) return;
+      $('chatInput').value = '';
+      try {
+        await api(`/api/offers/${encodeURIComponent(currentChatOfferId)}/messages`, {
+          method: 'POST',
+          body: JSON.stringify({ text: txt })
+        });
+        await loadChatMessages();
+      } catch(err) {
+        alert(err.message);
+      }
+    };
+
+    function renderOrders(orders) {
+      cachedOrders = orders || [];
+      $('orderCount').textContent = cachedOrders.length;
+      const list = $('orderList');
+      list.replaceChildren();
+
+      if (!cachedOrders.length) {
+        const e = document.createElement('p');
+        e.className = 'empty';
+        e.textContent = window.t('noOrdersYet');
+        list.append(e);
+        return;
+      }
+
+      for (const o of cachedOrders) {
+        const c = document.createElement('article');
+        c.className = 'offer-card';
+        const h = document.createElement('h3');
+        const translatedCrop = window.t(o.crop) || o.cropName || o.crop;
+        h.textContent = '📦 ' + translatedCrop;
+
+        const p = document.createElement('p');
+        const payStatusTrans = window.t('status' + o.paymentStatus[0].toUpperCase() + o.paymentStatus.slice(1)) || o.paymentStatus;
+        const delStatusTrans = window.t('status' + (o.deliveryStatus === 'in_transit' ? 'InTransit' : o.deliveryStatus[0].toUpperCase() + o.deliveryStatus.slice(1))) || o.deliveryStatus;
+
+        p.textContent = `${o.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'} · ${money(o.totalAmount)} ${window.t('total')} · ${window.t('paymentStatus')} ${payStatusTrans} · ${window.t('deliveryStatus')} ${delStatusTrans}`;
+
+        const sel = document.createElement('select');
+        const deliveryMap = {
+          'pending': window.t('statusPending'),
+          'ready': window.t('statusReady'),
+          'in_transit': window.t('statusInTransit'),
+          'delivered': window.t('statusDelivered')
+        };
+        for (const [v, label] of Object.entries(deliveryMap)) {
+          const op = document.createElement('option');
+          op.value = v;
+          op.textContent = label;
+          if (o.deliveryStatus === v) op.selected = true;
+          sel.append(op);
+        }
+
+        sel.addEventListener('change', async () => {
+          try {
+            await api('/api/orders/' + encodeURIComponent(o.id), {
+              method: 'PATCH',
+              body: JSON.stringify({ deliveryStatus: sel.value })
+            });
+            await loadAll();
+          } catch (e) {
+            msg($('actionMessage'), e.message, true);
+          }
+        });
+
+        const printBtn = document.createElement('button');
+        printBtn.type = 'button';
+        printBtn.className = 'secondary';
+        printBtn.style.marginTop = '8px';
+        printBtn.style.display = 'block';
+        printBtn.textContent = '🧾 ' + (window.t('printReceipt') || 'Print Mandi Bill');
+        printBtn.onclick = () => openMandiInvoice(o);
+
+        c.append(h, p, sel, printBtn);
+        list.append(c);
+      }
+    }
+
+    function openMandiInvoice(o) {
+      const cropTitle = window.t(o.crop) || o.cropName || o.crop;
+      const invNum = 'AGRI-' + (o.id ? o.id.slice(-6).toUpperCase() : Math.floor(100000 + Math.random()*900000));
+      const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN');
+      const rate = Math.round(Number(o.totalAmount || 0) / (Number(o.quantity) || 1));
+      const cess = Math.round(Number(o.totalAmount || 0) * 0.015);
+      const grandTotal = Number(o.totalAmount || 0) + cess;
+      const payStatus = window.t('status' + o.paymentStatus[0].toUpperCase() + o.paymentStatus.slice(1)) || o.paymentStatus;
+      const delStatus = window.t('status' + (o.deliveryStatus === 'in_transit' ? 'InTransit' : o.deliveryStatus[0].toUpperCase() + o.deliveryStatus.slice(1))) || o.deliveryStatus;
+
+      $('invoiceContent').innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;">
+          <div><strong>Trade Bill No:</strong> ${escapeHtml(invNum)}</div>
+          <div><strong>Date:</strong> ${escapeHtml(dateStr)}</div>
+        </div>
+        <div style="background:#F4F8F4;padding:10px;border-radius:6px;margin-bottom:12px;font-size:13px;">
+          <div><strong>Seller / Farmer:</strong> ${escapeHtml(o.farmerName || 'Registered Farmer')}</div>
+          <div><strong>Buyer / Mandi Trader:</strong> ${escapeHtml(o.buyerName || 'Registered Buyer')}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:13px;">
+          <thead>
+            <tr style="background:#E8F5E9;text-align:left;">
+              <th style="padding:6px;border:1px solid #ddd;">Crop</th>
+              <th style="padding:6px;border:1px solid #ddd;">Qty (Qtl)</th>
+              <th style="padding:6px;border:1px solid #ddd;">Agreed Rate (₹)</th>
+              <th style="padding:6px;border:1px solid #ddd;text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:6px;border:1px solid #ddd;">${escapeHtml(cropTitle)}</td>
+              <td style="padding:6px;border:1px solid #ddd;">${Number(o.quantity) || 0}</td>
+              <td style="padding:6px;border:1px solid #ddd;">₹${rate.toLocaleString('en-IN')}</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;">₹${Number(o.totalAmount || 0).toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding:6px;border:1px solid #ddd;text-align:right;color:#555;">Mandi Cess / User Fee (1.5%):</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;color:#555;">₹${cess.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr style="font-weight:bold;background:#F1F8E9;">
+              <td colspan="3" style="padding:6px;border:1px solid #ddd;text-align:right;">Total Settlement:</td>
+              <td style="padding:6px;border:1px solid #ddd;text-align:right;color:#2A7A4B;">₹${grandTotal.toLocaleString('en-IN')}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;color:#5B6E68;border-top:1px dashed #D9E2DD;padding-top:8px;">
+          <div><strong>Payment Status:</strong> ${escapeHtml(payStatus)} · <strong>Delivery:</strong> ${escapeHtml(delStatus)}</div>
+          <div style="margin-top:4px;">Direct Mandi e-Trading Settlement guaranteed under AgriSmart Fair Trade Benchmark.</div>
+        </div>
+      `;
+      $('invoiceDialog').showModal();
+    }
+
+    function renderListings(items) {
+      cachedListings = items || [];
+      const cont = $('myListingsContainer');
+      cont.replaceChildren();
+
+      const myList = selectedFarmerId ? cachedListings.filter(x => x.farmerId === selectedFarmerId) : cachedListings;
+      if (!myList.length) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = window.t('noListingsYet');
+        cont.append(p);
+        return;
+      }
+
+      for (const item of myList) {
+        const card = document.createElement('article');
+        card.className = 'offer-card';
+        const cropTitle = window.t(item.crop) || item.cropName || item.crop;
+        
+        const h = document.createElement('h3');
+        h.textContent = '🌾 ' + cropTitle + (item.variety ? ` (${item.variety})` : '');
+        
+        const p1 = document.createElement('p');
+        p1.innerHTML = `<strong>${item.quantity} ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'quintals'}</strong> @ <strong>${money(item.expectedPrice)} / ${window.currentLanguage === 'hi' ? 'क्विंटल' : 'qtl'}</strong>`;
+        
+        const p2 = document.createElement('p');
+        p2.style.fontSize = '13px';
+        p2.textContent = `${item.harvestDate ? 'Ready: ' + item.harvestDate + ' · ' : ''}${item.notes || 'Direct farm harvest lot'}`;
+        
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'secondary';
+        delBtn.style.marginTop = '8px';
+        delBtn.style.color = '#c62828';
+        delBtn.textContent = '🗑️ ' + (window.t('deleteListing') || 'Delete');
+        delBtn.onclick = () => deleteListing(item.id);
+
+        card.append(h, p1, p2, delBtn);
+        cont.append(card);
+      }
+    }
+
+    async function loadMyListings() {
+      try {
+        const res = await api('/api/listings');
+        renderListings(res.items || []);
+      } catch (err) {
+        console.error('Listings error:', err);
+      }
+    }
+
+    async function deleteListing(id) {
+      if (!confirm('Are you sure you want to remove this harvest listing?')) return;
+      try {
+        await api('/api/listings/' + encodeURIComponent(id), { method: 'DELETE' });
+        await loadMyListings();
+        msg($('listingMsg'), window.currentLanguage === 'hi' ? 'फसल लिस्टिंग सफलतापूर्वक हटाई गई।' : 'Listing deleted successfully.');
+      } catch (e) {
+        msg($('listingMsg'), e.message, true);
+      }
+    }
+
+    async function loadAll() {
+      const [offerRes, orderRes, cropRes] = await Promise.all([
+        api('/api/offers'),
+        api('/api/orders'),
+        api('/api/crops')
+      ]);
+
+      renderOffers(offerRes.items || []);
+      renderOrders(orderRes.items || []);
+      await loadMyListings();
+
+      crops = cropRes.items || {};
+      const cropOptions = Object.entries(crops).map(([k, v]) => {
+        const o = document.createElement('option');
+        o.value = k;
+        o.textContent = window.t(k) || v.n;
+        return o;
+      });
+
+      $('reportCrop').replaceChildren(...cropOptions.map(o => o.cloneNode(true)));
+      $('listingCrop').replaceChildren(...cropOptions.map(o => o.cloneNode(true)));
+    }
+
+    let cachedReports = [];
+
+    function updateReportEstimate() {
+      const a = Number($('reportArea').value) || 0,
+            p = Number($('reportProduction').value) || 0,
+            e = Number($('reportExpenses').value) || 0,
+            pr = Number($('reportPrice').value) || 0;
+      const rev = p * pr;
+      const profit = rev - e;
+      const pPerAcre = a > 0 ? (profit / a) : 0;
+      const isProfit = profit >= 0;
+      if ($('reportEstimateRevenue')) $('reportEstimateRevenue').textContent = money(rev);
+      if ($('reportEstimateProfit')) {
+        $('reportEstimateProfit').textContent = (isProfit ? '+' : '') + money(profit);
+        $('reportEstimateProfit').style.color = isProfit ? '#08743f' : '#c62828';
+      }
+      if ($('reportEstimatePerAcre')) {
+        $('reportEstimatePerAcre').textContent = money(pPerAcre) + ' / ' + (window.currentLanguage === 'hi' ? 'एकड़' : 'acre');
+        $('reportEstimatePerAcre').style.color = isProfit ? '#08743f' : '#c62828';
+      }
+    }
+
+    async function loadReports() {
+      try {
+        const res = await api('/api/reports');
+        renderReports(res.items || []);
+      } catch (err) {
+        console.error('Reports load error:', err);
+      }
+    }
+
+    function renderReports(items) {
+      cachedReports = items || [];
+      const cont = $('savedReportsList');
+      if (!cont) return;
+      cont.replaceChildren();
+
+      const totalRev = cachedReports.reduce((s, r) => s + Number(r.revenue || 0), 0);
+      const totalProf = cachedReports.reduce((s, r) => s + Number(r.profit || 0), 0);
+
+      if ($('statReportCount')) $('statReportCount').textContent = cachedReports.length;
+      if ($('statTotalRevenue')) $('statTotalRevenue').textContent = money(totalRev);
+      if ($('statTotalProfit')) {
+        $('statTotalProfit').textContent = (totalProf >= 0 ? '+' : '') + money(totalProf);
+        $('statTotalProfit').style.color = totalProf >= 0 ? '#08743f' : '#c62828';
+      }
+      if ($('reportSummaryCards')) $('reportSummaryCards').hidden = cachedReports.length === 0;
+
+      if (!cachedReports.length) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = window.t('noSavedReports') || 'No profitability reports saved yet. Fill out the calculator above and click Save Report.';
+        cont.append(p);
+        return;
+      }
+
+      const locale = window.currentLanguage === 'hi' ? 'hi-IN' : 'en-IN';
+      for (const item of cachedReports) {
+        const card = document.createElement('article');
+        card.className = 'offer-card';
+
+        const head = document.createElement('div');
+        head.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;';
+
+        const title = document.createElement('h3');
+        const cropName = window.t(item.crop) || item.cropName || item.crop;
+        title.textContent = `🌾 ${cropName}`;
+
+        const isProfit = Number(item.profit) >= 0;
+        const profitBadge = document.createElement('span');
+        profitBadge.style.cssText = `background:${isProfit ? '#e1f0e7' : '#ffebee'};color:${isProfit ? '#08743f' : '#c62828'};padding:3px 10px;border-radius:99px;font-weight:bold;font-size:13px;border:1px solid ${isProfit ? '#a3d4b6' : '#ffcdd2'};`;
+        profitBadge.textContent = `${isProfit ? '📈 ' + (window.t('netProfitLabel') || 'Profit') : '📉 ' + (window.t('netLossLabel') || 'Loss')}: ${isProfit ? '+' : ''}${money(item.profit)}`;
+
+        head.append(title, profitBadge);
+
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0;font-size:13px;background:var(--bg);padding:10px;border-radius:8px;';
+        
+        const qUnit = window.currentLanguage === 'hi' ? 'क्विंटल' : 'qtl';
+        const acreUnit = window.currentLanguage === 'hi' ? 'एकड़' : 'acres';
+        const pPerAcre = item.area > 0 ? (item.profit / item.area) : 0;
+
+        grid.innerHTML = `
+          <div><span style="color:var(--mut);">${window.t('areaAcres') || 'Area'}:</span> <strong>${item.area} ${acreUnit}</strong></div>
+          <div><span style="color:var(--mut);">${window.t('productionQ') || 'Yield'}:</span> <strong>${item.production} ${qUnit}</strong></div>
+          <div><span style="color:var(--mut);">${window.t('expensesRs') || 'Expenses'}:</span> <strong>${money(item.expenses)}</strong></div>
+          <div><span style="color:var(--mut);">${window.t('salePriceRs') || 'Sale Price'}:</span> <strong>${money(item.price)}/${qUnit}</strong></div>
+          <div><span style="color:var(--mut);">${window.t('revenueLabel') || 'Revenue'}:</span> <strong>${money(item.revenue)}</strong></div>
+          <div><span style="color:var(--mut);">${window.t('profitPerAcre') || 'Per Acre'}:</span> <strong style="color:${isProfit ? '#08743f' : '#c62828'}">${(isProfit ? '+' : '') + money(pPerAcre)}</strong></div>
+        `;
+
+        const dateP = document.createElement('p');
+        dateP.style.cssText = 'font-size:12px;color:var(--mut);margin:4px 0 10px;';
+        dateP.textContent = `📅 ${new Date(item.createdAt).toLocaleString(locale)}`;
+
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:8px;';
+
+        const printBtn = document.createElement('button');
+        printBtn.type = 'button';
+        printBtn.className = 'secondary';
+        printBtn.style.cssText = 'font-size:12px;padding:5px 12px;';
+        printBtn.textContent = '🖨️ ' + (window.t('printReport') || 'Print / Receipt');
+        printBtn.onclick = () => printReportReceipt(item);
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'secondary';
+        delBtn.style.cssText = 'font-size:12px;padding:5px 12px;color:#c62828;border-color:#ffcdd2;';
+        delBtn.textContent = '🗑️ ' + (window.t('deleteReport') || 'Delete');
+        delBtn.onclick = () => deleteReport(item.id);
+
+        actions.append(printBtn, delBtn);
+        card.append(head, grid, dateP, actions);
+        cont.append(card);
+      }
+    }
+
+    async function deleteReport(id) {
+      const confirmMsg = window.currentLanguage === 'hi' ? 'क्या आप इस लाभप्रदता रिपोर्ट को हटाना चाहते हैं?' : 'Are you sure you want to delete this profitability report?';
+      if (!confirm(confirmMsg)) return;
+      try {
+        await api('/api/reports/' + encodeURIComponent(id), { method: 'DELETE' });
+        await loadReports();
+        msg($('reportResult'), window.currentLanguage === 'hi' ? 'रिपोर्ट सफलतापूर्वक हटा दी गई।' : 'Report deleted successfully.');
+      } catch (err) {
+        msg($('reportResult'), err.message, true);
+      }
+    }
+
+    function printReportReceipt(report) {
+      const isHi = window.currentLanguage === 'hi';
+      const cropName = window.t(report.crop) || report.cropName || report.crop;
+      const isProfit = Number(report.profit) >= 0;
+      const pPerAcre = report.area > 0 ? (report.profit / report.area) : 0;
+      
+      const content = `
+        <div style="font-family:system-ui,sans-serif;padding:10px;">
+          <div style="display:flex;justify-content:space-between;border-bottom:2px solid #2A7A4B;padding-bottom:10px;margin-bottom:12px;">
+            <div>
+              <h2 style="margin:0;color:#2A7A4B;">🌾 AGRISMART CROP PROFITABILITY CERTIFICATE</h2>
+              <p style="margin:2px 0 0;font-size:13px;color:#555;">Farm Economic Assessment & Yield Statement</p>
+            </div>
+            <div style="text-align:right;font-size:13px;">
+              <strong>Date:</strong> ${new Date(report.createdAt).toLocaleDateString()}<br>
+              <strong>Ref ID:</strong> ${report.id.slice(0, 8).toUpperCase()}
+            </div>
+          </div>
+          
+          <table style="width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;">
+            <tr style="background:#f6f8f5;border-bottom:1px solid #ddd;"><th style="padding:8px;text-align:left;">Parameter</th><th style="padding:8px;text-align:right;">Value</th></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Crop Name / फसल</td><td style="padding:8px;text-align:right;font-weight:bold;">${escapeHtml(cropName)}</td></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Cultivated Area / रकबा</td><td style="padding:8px;text-align:right;">${report.area} ${isHi ? 'एकड़' : 'Acres'}</td></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Total Harvest Production / कुल पैदावार</td><td style="padding:8px;text-align:right;">${report.production} ${isHi ? 'क्विंटल' : 'Quintals'}</td></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Selling Benchmark Rate / विक्रय दर</td><td style="padding:8px;text-align:right;">${money(report.price)} / ${isHi ? 'क्विंटल' : 'qtl'}</td></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Gross Revenue / कुल आय</td><td style="padding:8px;text-align:right;font-weight:bold;color:#08743f;">${money(report.revenue)}</td></tr>
+            <tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">Total Input & Labor Expenses / कुल लागत</td><td style="padding:8px;text-align:right;color:#c62828;">${money(report.expenses)}</td></tr>
+            <tr style="background:#eef6f1;font-size:16px;border-top:2px solid #2A7A4B;"><td style="padding:10px;font-weight:bold;">Net Farm Profit / Loss (शुद्ध मुनाफा)</td><td style="padding:10px;text-align:right;font-weight:bold;color:${isProfit ? '#08743f' : '#c62828'};">${(isProfit ? '+' : '') + money(report.profit)}</td></tr>
+            <tr style="background:#fbfbfb;"><td style="padding:8px;">Net Profit per Acre / प्रति एकड़ लाभ</td><td style="padding:8px;text-align:right;font-weight:bold;">${money(pPerAcre)} / ${isHi ? 'एकड़' : 'acre'}</td></tr>
+          </table>
+          <p style="font-size:11px;color:#777;margin-top:16px;text-align:center;">Generated by AgriSmart Agri-Tech Platform · Empowering Indian Farmers with Accurate Farm Analytics.</p>
+        </div>
+      `;
+      $('invoiceContent').innerHTML = content;
+      $('invoiceDialog').showModal();
+    }
+
+    async function detectFarmerDistrict() {
+      const btn = $('detectFarmerLocBtn');
+      if (btn) btn.textContent = '⏳ Detecting…';
+      try {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async pos => {
+            const { latitude, longitude } = pos.coords;
+            try {
+              const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`, { signal: AbortSignal.timeout(4000) });
+              if (geoRes.ok) {
+                const geo = await geoRes.json();
+                const locality = geo.locality || geo.city || geo.principalSubdivision;
+                if (locality) $('farmerDistrict').value = locality;
+              }
+            } catch(e) {}
+            if (btn) btn.textContent = '✅ ' + (window.t('detectFarmerLocation') || 'Auto-detect District');
+          }, async () => {
+            await ipDetectFarmerDistrict();
+          }, { timeout: 6000 });
+        } else {
+          await ipDetectFarmerDistrict();
+        }
+      } catch(e) {
+        if (btn) btn.textContent = '📍 ' + (window.t('detectFarmerLocation') || 'Auto-detect District');
+      }
+    }
+
+    async function ipDetectFarmerDistrict() {
+      const btn = $('detectFarmerLocBtn');
+      try {
+        const r = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout(4000) })
+          .catch(() => fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) }));
+        if (r && r.ok) {
+          const d = await r.json();
+          const city = d.cityName || d.city;
+          if (city) $('farmerDistrict').value = city;
+        }
+      } catch(e) {}
+      if (btn) btn.textContent = '📍 ' + (window.t('detectFarmerLocation') || 'Auto-detect District');
+    }
+
+    async function init() {
+      const me = await requireAuth('farmer');
+      if (!me) return;
+      addAuthNav(me.user.role);
+      if ($('authFarmerName')) $('authFarmerName').textContent = me.user.name;
+      if ($('authFarmerEmail')) $('authFarmerEmail').textContent = `${me.user.email} · Farm: ${me.farmer ? me.farmer.name + ' (' + me.farmer.district + ')' : 'Profile setup below'}`;
+      const loginInfo = window.currentLanguage === 'hi'
+        ? `लॉगिन स्थिति: ${me.user.name} (${me.user.email})। ${me.farmer ? 'आपकी फार्म प्रोफ़ाइल: ' + me.farmer.name + ' — ' + me.farmer.district : 'नीचे फार्म प्रोफ़ाइल बनाएं।'}`
+        : `Logged in as ${me.user.name} (${me.user.email}). ${me.farmer ? 'Your farm profile: ' + me.farmer.name + ' — ' + me.farmer.district : 'Create a farm profile below.'}`;
+      $('profileName').textContent = loginInfo;
+      $('profilePicker').hidden = false;
+
+      if (me.farmer) {
+        selectedFarmerId = me.farmer.id;
+        $('farmerName').value = me.farmer.name;
+        $('farmerDistrict').value = me.farmer.district;
+        $('createProfile').textContent = window.t('updateProfileBtn') || 'Update Farm Profile';
+      }
+      await loadLocations();
+      await loadAll();
+      await loadReports();
+      updateReportEstimate();
+    }
+
+    async function loadLocations() {
+      try {
+        const r = await api('/api/locations');
+        $('farmerLocations').replaceChildren(...(r.items || []).map(x => {
+          const o = document.createElement('option');
+          o.value = x.district;
+          return o;
+        }));
+      } catch {}
+    }
+
+    $('profileForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        const f = await api('/api/farmers', {
+          method: 'POST',
+          body: JSON.stringify({ name: $('farmerName').value, district: $('farmerDistrict').value })
+        });
+        selectedFarmerId = f.id;
+        msg($('profileMessage'), selectedFarmerId ? (window.t('profileUpdated') || 'Farm profile updated.') : window.t('profileCreated'));
+        await init();
+      } catch (e) {
+        msg($('profileMessage'), e.message, true);
+      }
+    });
+
+    $('refreshOffers').onclick = () => loadAll().catch(e => msg($('actionMessage'), e.message, true));
+    $('refreshOrders').onclick = () => loadAll().catch(e => msg($('actionMessage'), e.message, true));
+
+    for (const field of ['reportArea', 'reportProduction', 'reportExpenses', 'reportPrice']) {
+      $(field).addEventListener('input', updateReportEstimate);
+    }
+
+    $('saveReport').onclick = async () => {
+      try {
+        const crop = $('reportCrop').value,
+              area = Number($('reportArea').value),
+              production = Number($('reportProduction').value),
+              expenses = Number($('reportExpenses').value),
+              price = Number($('reportPrice').value);
+        const r = await api('/api/reports', {
+          method: 'POST',
+          body: JSON.stringify({ crop, area, production, expenses, price })
+        });
+        const repText = window.t('reportSaved')
+          .replace('{rev}', money(r.revenue))
+          .replace('{prof}', money(r.profit));
+        msg($('reportResult'), repText);
+        await loadReports();
+      } catch (e) {
+        msg($('reportResult'), e.message, true);
+      }
+    };
+
+    $('produceListingForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!selectedFarmerId) {
+        msg($('listingMsg'), window.currentLanguage === 'hi' ? 'कृपया पहले अपनी फार्म प्रोफ़ाइल बनाएं।' : 'Please create or select your farmer profile first.', true);
+        return;
+      }
+      try {
+        const cropKey = $('listingCrop').value;
+        const cropName = crops[cropKey] ? crops[cropKey].n : cropKey;
+        await api('/api/listings', {
+          method: 'POST',
+          body: JSON.stringify({
+            farmerId: selectedFarmerId,
+            crop: cropKey,
+            cropName,
+            variety: $('listingVariety').value.trim(),
+            quantity: Number($('listingQuantity').value),
+            expectedPrice: Number($('listingPrice').value),
+            harvestDate: $('listingDate').value,
+            notes: $('listingNotes').value.trim()
+          })
+        });
+        msg($('listingMsg'), window.currentLanguage === 'hi' ? 'फसल लिस्टिंग सफलतापूर्वक प्रकाशित की गई!' : 'Harvest listing published to marketplace!');
+        $('produceListingForm').reset();
+        $('listingQuantity').value = '20';
+        $('listingPrice').value = '2400';
+        await loadMyListings();
+      } catch (err) {
+        msg($('listingMsg'), err.message, true);
+      }
+    });
+
+    // Reactively refresh UI when language is switched
+    document.addEventListener('agrismart-lang-changed', () => {
+      renderOffers(cachedOffers);
+      renderOrders(cachedOrders);
+      renderListings(cachedListings);
+      renderReports(cachedReports);
+      updateReportEstimate();
+      if (Object.keys(crops).length) {
+        const cropOptions = Object.entries(crops).map(([k, v]) => {
+          const o = document.createElement('option');
+          o.value = k;
+          o.textContent = window.t(k) || v.n;
+          return o;
+        });
+        $('reportCrop').replaceChildren(...cropOptions.map(o => o.cloneNode(true)));
+        $('listingCrop').replaceChildren(...cropOptions.map(o => o.cloneNode(true)));
+      }
+    });
+
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+    init().catch(e => msg($('actionMessage'), e.message, true));
+  </script>
+</body>
+</html>

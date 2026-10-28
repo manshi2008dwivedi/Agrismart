@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: agrismart-website
+    env: node
+    plan: free
+    buildCommand: "npm run build"
+    startCommand: "npm start"
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_ENV
+        value: production
+      - key: ALLOW_DEV_OTP
+        value: false
+      - key: GEMINI_API_KEY
+        sync: false

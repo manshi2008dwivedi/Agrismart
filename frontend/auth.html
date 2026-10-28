@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#2A7A4B">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <title>Login / Register | AgriSmart</title>
+  <style>
+    :root{--bg:#F6F8F5;--card:#fff;--ink:#14312B;--mut:#5B6E68;--line:#D9E2DD;--ac:#2A7A4B;--acs:#E1F0E7;--danger:#A52C24}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+    main{width:min(480px,calc(100% - 32px));margin:5vh auto}
+    .header-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+    .brand{font-size:30px;font-weight:800;}.brand span{color:var(--ac)}
+    .lang-picker{display:inline-flex;align-items:center;background:#054728;border-radius:8px;padding:4px 10px;color:white;}
+    .lang-picker select{background:transparent;color:white;border:none;font-weight:bold;cursor:pointer;outline:none;font-size:13px;}
+    .lang-picker select option{background:#075c35;color:white;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;box-shadow:0 8px 30px #14312b10}
+    h1{margin:0 0 4px;font-size:24px;}
+    .muted{color:var(--mut);margin:0 0 16px;font-size:15px;}
+    label{display:block;font-weight:650;margin:12px 0}
+    input,select{display:block;width:100%;margin-top:5px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+    button{width:100%;padding:11px 14px;border:0;border-radius:8px;background:var(--ac);color:#fff;font:600 16px system-ui;cursor:pointer;margin-top:12px;transition:filter 0.2s}
+    button:hover{filter:brightness(0.95)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:16px 0}
+    .tabs button{margin:0;background:var(--bg);color:var(--ink);border:1px solid var(--line);font-size:12px;padding:9px 4px;font-weight:600;}
+    .tabs button.active{background:var(--ac);color:#fff}
+    .message{font-weight:650;color:var(--ac);min-height:24px;margin-top:12px;}
+    .error{color:var(--danger)}
+    .back{display:block;text-align:center;margin-top:20px;color:var(--ac);text-decoration:none;font-weight:600;}
+    .back:hover{text-decoration:underline}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="header-bar">
+      <div class="brand" data-i18n="brand">🌾 Agri<span>smart</span></div>
+      <div class="lang-picker">
+        <span style="font-size:14px;margin-right:4px;">🌐</span>
+        <select id="langSelect" class="lang-select" onchange="setLanguage(this.value)">
+          <option value="hi">हिंदी (HI)</option>
+          <option value="en">English (EN)</option>
+        </select>
+      </div>
+    </div>
+
+    <section class="card">
+      <h1 id="heading" data-i18n="authWelcome">Welcome back</h1>
+      <p class="muted" id="subheading" data-i18n="authSubOtp">Fast & secure passwordless login with 6-digit email OTP.</p>
+
+      <!-- Authorization Required Notice -->
+      <div id="authNotice" style="display:none;background:#eef6f1;border:1px solid #2A7A4B;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:14px;color:#14312B;">
+        <strong id="authNoticeTitle" style="color:#08743f;">🔒 Authorization Required (लॉगिन आवश्यक)</strong>
+        <p id="authNoticeText" style="margin:4px 0 0;font-size:13px;color:#355348;">Please log in or create an account to access the dashboard.</p>
+      </div>
+
+      <div class="tabs">
+        <button id="otpTab" class="active" type="button" data-i18n="tabOtpLogin">✉️ Email OTP</button>
+        <button id="loginTab" type="button" data-i18n="tabPasswordLogin">🔑 Password</button>
+        <button id="registerTab" type="button" data-i18n="tabRegister">📝 Create account</button>
+      </div>
+
+      <form id="authForm">
+        <label id="nameWrap" hidden>
+          <span data-i18n="name">Name</span>
+          <input id="name" autocomplete="name" maxlength="80">
+        </label>
+        
+        <label>
+          <span data-i18n="email">Email</span>
+          <input id="email" type="email" autocomplete="email" required placeholder="farmer@example.com">
+        </label>
+
+        <!-- Email OTP Section -->
+        <div id="otpWrap">
+          <div style="display:flex;gap:8px;align-items:center;margin:8px 0 10px;">
+            <button id="sendOtpBtn" type="button" onclick="sendOtp()" style="margin:0;padding:10px 14px;background:#08743f;font-size:13px;width:auto;flex-shrink:0;" data-i18n="sendOtpBtn">
+              📨 Send OTP to Email
+            </button>
+            <span id="resendCountdown" style="font-size:12px;color:#5b6e68;"></span>
+          </div>
+
+          <div id="otpDevBanner" style="display:none;background:#e1f0e7;border:1px dashed #2A7A4B;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;color:#08743f;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span>📨 <strong>Verification code sent!</strong></span><br>
+                <span>Demo Code: <strong style="letter-spacing:2px;font-size:16px;color:#08743f;" id="hintOtpVal">------</strong></span>
+              </div>
+              <button type="button" onclick="autofillOtp()" style="margin:0;padding:5px 10px;font-size:12px;background:#08743f;color:#fff;border-radius:6px;cursor:pointer;border:none;width:auto;" data-i18n="autofillOtp">Auto-fill</button>
+            </div>
+          </div>
+
+          <label id="otpInputWrap">
+            <span data-i18n="otpLabel">Enter 6-digit OTP Code</span>
+            <input id="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="e.g. 123456" autocomplete="one-time-code" style="letter-spacing:4px;font-size:18px;font-weight:bold;text-align:center;">
+          </label>
+        </div>
+
+        <label id="passwordWrap" hidden>
+          <span data-i18n="password">Password</span>
+          <input id="password" type="password" minlength="8" maxlength="128" autocomplete="current-password">
+        </label>
+
+        <label id="roleWrap" hidden>
+          <span data-i18n="accountType">Account type</span>
+          <select id="role">
+            <option value="farmer" data-i18n="roleFarmer">Farmer</option>
+            <option value="buyer" data-i18n="roleBuyer">Buyer</option>
+          </select>
+        </label>
+
+        <label id="districtWrap" hidden>
+          <span data-i18n="district">District</span>
+          <input id="district" value="Sehore" maxlength="80">
+        </label>
+
+        <button id="submit" type="submit" data-i18n="verifyOtpBtn">Verify OTP & Login</button>
+      </form>
+      <p id="message" class="message" role="status"></p>
+    </section>
+
+    <a class="back" href="index.html" data-i18n="backHome">← Back to AgriSmart home</a>
+  </main>
+
+  <!-- Load i18n BEFORE auth logic -->
+  <script src="i18n.js"></script>
+  <script src="auth.js"></script>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let mode = 'otp';
+    let resendTimer = null;
+    let currentDevOtp = '';
+
+    function setMode(next) {
+      mode = next;
+      $('otpTab').classList.toggle('active', mode === 'otp');
+      $('loginTab').classList.toggle('active', mode === 'login');
+      $('registerTab').classList.toggle('active', mode === 'register');
+
+      if (mode === 'otp') {
+        $('heading').textContent = window.t('authWelcome');
+        $('subheading').textContent = window.t('authSubOtp');
+        $('otpWrap').hidden = false;
+        $('passwordWrap').hidden = true;
+        $('password').required = false;
+        $('nameWrap').hidden = true;
+        $('name').required = false;
+        $('roleWrap').hidden = true;
+        $('districtWrap').hidden = true;
+        $('submit').textContent = window.t('verifyOtpBtn');
+      } else if (mode === 'login') {
+        $('heading').textContent = window.t('authWelcome');
+        $('subheading').textContent = window.t('authSubLogin');
+        $('otpWrap').hidden = true;
+        $('passwordWrap').hidden = false;
+        $('password').required = true;
+        $('nameWrap').hidden = true;
+        $('name').required = false;
+        $('roleWrap').hidden = true;
+        $('districtWrap').hidden = true;
+        $('submit').textContent = window.t('submitLogin');
+      } else if (mode === 'register') {
+        $('heading').textContent = window.t('authCreate');
+        $('subheading').textContent = window.t('authSubRegister');
+        $('otpWrap').hidden = true;
+        $('passwordWrap').hidden = false;
+        $('password').required = true;
+        $('nameWrap').hidden = false;
+        $('name').required = true;
+        $('roleWrap').hidden = false;
+        $('districtWrap').hidden = $('role').value !== 'farmer';
+        $('submit').textContent = window.t('submitRegister');
+      }
+      $('message').textContent = '';
+      $('message').className = 'message';
+    }
+
+    $('otpTab').onclick = () => setMode('otp');
+    $('loginTab').onclick = () => setMode('login');
+    $('registerTab').onclick = () => setMode('register');
+    $('role').onchange = () => {
+      $('districtWrap').hidden = mode !== 'register' || $('role').value !== 'farmer';
+    };
+
+    async function sendOtp() {
+      const mail = $('email').value.trim();
+      if (!mail) {
+        $('message').textContent = (window.t('email') || 'Email') + ' is required.';
+        $('message').className = 'message error';
+        $('email').focus();
+        return;
+      }
+      const btn = $('sendOtpBtn');
+      btn.disabled = true;
+      $('message').textContent = '';
+      $('message').className = 'message';
+      try {
+        const res = await fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: mail, purpose: 'login' })
+        });
+        const d = await res.json();
+        if (!res.ok) {
+          if (d.code === 'USER_NOT_FOUND') {
+            throw new Error((window.t('noAccountFound') || d.error) + ' -> Click "Create account" tab to register.');
+          }
+          throw new Error(d.error || 'Failed to send OTP.');
+        }
+
+        currentDevOtp = d.devOtp || '';
+        if (d.devOtp) {
+          $('otpDevBanner').style.display = 'block';
+          $('hintOtpVal').textContent = d.devOtp;
+        }
+        $('otp').focus();
+        $('message').textContent = window.t('otpSentMsg') || 'OTP sent! Please check your email inbox.';
+        $('message').className = 'message';
+
+        let left = 30;
+        btn.textContent = (window.t('waitCountdown') || 'Resend in {s}s').replace('{s}', left);
+        clearInterval(resendTimer);
+        resendTimer = setInterval(() => {
+          left--;
+          if (left <= 0) {
+            clearInterval(resendTimer);
+            btn.disabled = false;
+            btn.textContent = window.t('resendOtpBtn') || 'Resend OTP';
+          } else {
+            btn.textContent = (window.t('waitCountdown') || 'Resend in {s}s').replace('{s}', left);
+          }
+        }, 1000);
+      } catch (err) {
+        $('message').textContent = err.message;
+        $('message').className = 'message error';
+        btn.disabled = false;
+      }
+    }
+
+    function autofillOtp() {
+      if (currentDevOtp) {
+        $('otp').value = currentDevOtp;
+        $('otp').focus();
+      }
+    }
+
+    $('authForm').onsubmit = async e => {
+      e.preventDefault();
+      const btn = $('submit');
+      btn.disabled = true;
+      $('message').className = 'message';
+      try {
+        let data;
+        if (mode === 'otp') {
+          const email = $('email').value.trim();
+          const otp = $('otp').value.trim();
+          if (!otp) throw new Error(window.t('otpRequired') || 'Please enter the 6-digit OTP code.');
+          const res = await fetch('/api/auth/login-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp })
+          });
+          data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Authentication failed');
+        } else if (mode === 'login') {
+          const payload = {
+            email: $('email').value.trim(),
+            password: $('password').value
+          };
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Authentication failed');
+        } else if (mode === 'register') {
+          const payload = {
+            name: $('name').value.trim(),
+            email: $('email').value.trim(),
+            password: $('password').value,
+            role: $('role').value,
+            district: $('district').value.trim()
+          };
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Registration failed');
+        }
+
+        saveAuth(data);
+        const redirect = sessionStorage.getItem('agrismart-auth-redirect');
+        sessionStorage.removeItem('agrismart-auth-redirect');
+        if (redirect && !redirect.includes('auth.html')) {
+          if ((redirect.includes('farmer') && data.user.role === 'farmer') ||
+              (redirect.includes('buyer') && data.user.role === 'buyer')) {
+            location.href = redirect;
+            return;
+          }
+        }
+        location.href = data.user.role === 'farmer' ? 'farmer.html' : 'buyer.html';
+      } catch (err) {
+        $('message').textContent = err.message;
+        $('message').className = 'message error';
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    function processUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('authRequired')) {
+        $('authNotice').style.display = 'block';
+        const reqRole = urlParams.get('role');
+        const isHi = window.currentLanguage === 'hi';
+        if (reqRole === 'farmer') {
+          $('authNoticeText').textContent = isHi
+            ? 'किसान डैशबोर्ड, फसल लिस्टिंग और ऑर्डर का प्रबंधन करने के लिए कृपया अपने किसान खाते में लॉगिन करें या नया खाता बनाएं।'
+            : 'Please log in to your Farmer account or register to manage your crops, produce listings, and orders.';
+        } else if (reqRole === 'buyer') {
+          $('authNoticeText').textContent = isHi
+            ? 'व्यापारी डैशबोर्ड, मंडी बाज़ार और खरीद प्रस्तावों के लिए कृपया अपने व्यापारी खाते में लॉगिन करें या नया खाता बनाएं।'
+            : 'Please log in to your Buyer account or register to browse marketplace crops and make procurement offers.';
+        }
+      }
+
+      if (urlParams.get('mode') === 'register' || urlParams.get('register')) {
+        setMode('register');
+      } else if (urlParams.get('mode') === 'password') {
+        setMode('login');
+      }
+      if (urlParams.get('role') && (urlParams.get('role') === 'farmer' || urlParams.get('role') === 'buyer')) {
+        $('role').value = urlParams.get('role');
+      }
+    }
+
+    document.addEventListener('agrismart-lang-changed', () => {
+      setMode(mode);
+      processUrlParams();
+    });
+
+    if (authToken()) {
+      getMe().then(data => {
+        if (data?.user) {
+          const redirect = sessionStorage.getItem('agrismart-auth-redirect');
+          sessionStorage.removeItem('agrismart-auth-redirect');
+          if (redirect && !redirect.includes('auth.html')) {
+            if ((redirect.includes('farmer') && data.user.role === 'farmer') ||
+                (redirect.includes('buyer') && data.user.role === 'buyer')) {
+              location.href = redirect;
+              return;
+            }
+          }
+          location.href = data.user.role === 'farmer' ? 'farmer.html' : 'buyer.html';
+        }
+      }).catch(() => {});
+    }
+
+    setMode('otp');
+    processUrlParams();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

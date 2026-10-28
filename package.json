@@ -1,0 +1,27 @@
+{
+  "name": "agrismart",
+  "version": "1.0.0",
+  "description": "AgriSmart — AI-Powered Smart Agriculture, Multilingual Mandi & Fair Trade Marketplace",
+  "type": "module",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "build": "node -e \"console.log('Build completed successfully')\"",
+    "test": "node backend/test_api.cjs",
+    "db:export-sql": "node backend/db_export.js"
+  },
+  "keywords": [
+    "agriculture",
+    "mandi",
+    "farmers",
+    "smart-farming",
+    "pwa",
+    "fullstack"
+  ],
+  "author": "AgriSmart",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
