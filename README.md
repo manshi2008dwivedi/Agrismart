@@ -1,3 +1,4 @@
+HEAD
 # AgriSmart — Smart Agriculture, Mandi Marketplace & Advisory Platform
 
 AgriSmart is an end-to-end, production-ready smart agriculture web platform connecting Indian farmers with direct buyers, offering live weather intelligence, dynamic mandi market rates, AI-driven soil & fertilizer recommendations, crop disease diagnosis, direct negotiation, and order settlement tracking.
@@ -120,3 +121,5 @@ curl http://localhost:3000/api/health
 | `GEMINI_API_KEY` | *(empty)* | Optional API key for Google Gemini AI advisory engine |
 | `DATA_PATH` | `backend/data/db.json`| Absolute or relative path to persist database file |
 | `PUBLIC_DIR` | `frontend/` | Absolute or relative path for static UI assets |
+# Agrismart
+>>>>>>> 4c9a6055181dda0c3655eeb3a95962b29d57cfed
